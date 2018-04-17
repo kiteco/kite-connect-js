@@ -3,11 +3,13 @@
 
 const fs = require('fs');
 const proc = require('child_process');
+const https = require('https');
 const sinon = require('sinon');
 const expect = require('expect.js');
 const WindowsAdapter = require('../../lib/support/windows');
 
 const {waitsForPromise} = require('../helpers/async');
+const {fakeResponse, withFakeServer} = require('../helpers/http');
 const {fakeCommands} = require('../helpers/child_process');
 const {
   fakeKiteInstallPaths, withKiteInstalled, withKiteRunning, withKiteNotRunning,
@@ -30,6 +32,60 @@ describe('WindowsAdapter', () => {
         return waitsForPromise({
           shouldReject: true,
         }, () => WindowsAdapter.isKiteInstalled());
+      });
+    });
+  });
+
+  describe('.downloadKite()', () => {
+    withFakeServer([
+      [
+        o => /^https:\/\/kite\.com/.test(o),
+        o => fakeResponse(303, '', {headers: {location: 'https://download.kite.com'}}),
+      ], [
+        o => /^https:\/\/download\.kite\.com/.test(o),
+        o => fakeResponse(200, 'foo'),
+      ],
+    ], () => {
+      describe('when the download succeeds', () => {
+        let unlinkSpy;
+        beforeEach(() => {
+          unlinkSpy = sinon.stub(fs, 'unlinkSync');
+          fakeCommands({
+            exec: {
+              [WindowsAdapter.KITE_INSTALLER_PATH + ' --skip-onboarding --plugin-launch']: () => 0,
+            },
+            del: () => 0,
+          });
+        });
+
+        afterEach(() => {
+          unlinkSpy.restore();
+        });
+
+        describe('with the install option', () => {
+          it('returns a promise resolved after the install', () => {
+            const options = {
+              install: true,
+              onDownload: sinon.spy(),
+              onInstallStart: sinon.spy(),
+              onCopy: sinon.spy(),
+              onRemove: sinon.spy(),
+            };
+            const url = 'https://kite.com/download';
+
+            WindowsAdapter.downloadKite(url, options)
+            .then(() => {
+              expect(https.request.calledWith(url)).to.be.ok();
+
+              expect(proc.exec.called).to.be.ok();
+              expect(fs.unlinkSync.calledWith(WindowsAdapter.KITE_INSTALLER_PATH)).to.be.ok();
+
+              expect(options.onInstallStart.called).to.be.ok();
+              expect(options.onCopy.called).to.be.ok();
+              expect(options.onRemove.called).to.be.ok();
+            });
+          });
+        });
       });
     });
   });

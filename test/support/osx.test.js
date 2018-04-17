@@ -1,13 +1,15 @@
 
 'use strict';
 
-const sinon = require('sinon');
 const proc = require('child_process');
+const https = require('https');
+const sinon = require('sinon');
 const expect = require('expect.js');
 
 const OSXAdapter = require('../../lib/support/osx');
 
 const {waitsForPromise} = require('../helpers/async');
+const {fakeResponse, withFakeServer} = require('../helpers/http');
 const {fakeCommands} = require('../helpers/child_process');
 const {
   fakeKiteInstallPaths, withKiteInstalled, withKiteRunning, withKiteNotRunning,
@@ -94,6 +96,85 @@ describe('OSXAdapter', () => {
     withBothKiteInstalled(PLATFORM, () => {
       it('returns a resolved promise', () => {
         return waitsForPromise(() => OSXAdapter.hasBothKiteInstalled());
+      });
+    });
+  });
+
+  describe('.downloadKite()', () => {
+    withFakeServer([
+      [
+        o => /^https:\/\/kite\.com/.test(o),
+        o => fakeResponse(303, '', {headers: {location: 'https://download.kite.com'}}),
+      ], [
+        o => /^https:\/\/download\.kite\.com/.test(o),
+        o => fakeResponse(200, 'foo'),
+      ],
+    ], () => {
+      describe('when the download succeeds', () => {
+        beforeEach(() => {
+          fakeCommands({
+            hdiutil: () => 0,
+            cp: () => 0,
+            rm: () => 0,
+            mdfind: (ps) => {
+              ps.stdout('');
+              return 0;
+            },
+          });
+        });
+
+        describe('with the install option', () => {
+          it('returns a promise resolved after the install', () => {
+            const options = {
+              install: true,
+              onDownload: sinon.spy(),
+              onInstallStart: sinon.spy(),
+              onMount: sinon.spy(),
+              onCopy: sinon.spy(),
+              onUnmount: sinon.spy(),
+              onRemove: sinon.stub().callsFake(() => {
+                fakeCommands({
+                  mdfind: (ps, args) => {
+                    const [, key] = args[0].split(/\s=\s/);
+                    key === '"com.kite.Kite"'
+                      ? ps.stdout('/Applications/Kite.app')
+                      : ps.stdout('');
+                    return 0;
+                  },
+                });
+              }),
+            };
+            const url = 'https://kite.com/download';
+
+            return OSXAdapter.downloadKite(url, options)
+            .then(() => {
+              expect(https.request.calledWith(url)).to.be.ok();
+              expect(proc.spawn.calledWith('hdiutil', [
+                'attach', '-nobrowse',
+                OSXAdapter.KITE_DMG_PATH,
+              ])).to.be.ok();
+              expect(proc.spawn.calledWith('cp', [
+                '-r',
+                OSXAdapter.KITE_APP_PATH.mounted,
+                OSXAdapter.APPS_PATH,
+              ])).to.be.ok();
+              expect(proc.spawn.calledWith('hdiutil', [
+                'detach',
+                OSXAdapter.KITE_VOLUME_PATH,
+              ])).to.be.ok();
+              expect(proc.spawn.calledWith('rm', [
+                OSXAdapter.KITE_DMG_PATH,
+              ])).to.be.ok();
+
+              expect(options.onDownload.called).to.be.ok();
+              expect(options.onInstallStart.called).to.be.ok();
+              expect(options.onMount.called).to.be.ok();
+              expect(options.onCopy.called).to.be.ok();
+              expect(options.onUnmount.called).to.be.ok();
+              expect(options.onRemove.called).to.be.ok();
+            });
+          });
+        });
       });
     });
   });

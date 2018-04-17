@@ -1,5 +1,15 @@
 const sinon = require('sinon');
 
+function fakeStream() {
+  return {
+    on(evt, callback) {
+      if (evt === 'finish') {
+        callback && callback();
+      }
+    },
+  };
+}
+
 /**
  * Creates a fake `http.IncomingMessage` response object  to pass as argument
  * to listeners of the `response` event of a fake request object.
@@ -14,6 +24,9 @@ function fakeResponse(statusCode, data, props) {
   const resp = {
     statusCode,
     req: {},
+    pipe(stream) {
+      return fakeStream();
+    },
     on(event, callback) {
       switch (event) {
         case 'data':
@@ -81,7 +94,7 @@ function fakeRequestMethod(resp) {
         }
       },
       end() {
-        if (resp) {
+        if (resp && callback) {
           typeof resp == 'function'
             ? callback(decorateResponse(resp(opts), req))
             : callback(decorateResponse(resp, req));
@@ -146,9 +159,17 @@ function withFakeServer(routes, block) {
   });
 }
 
+function withRoutes(routes) {
+  beforeEach(function() {
+    routes.reverse().forEach(route => this.routes.unshift(route));
+  });
+}
+
 module.exports = {
   fakeRequestMethod,
   fakeResponse,
   fakeRouter,
+  fakeStream,
   withFakeServer,
+  withRoutes,
 };

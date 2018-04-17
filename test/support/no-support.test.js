@@ -28,6 +28,14 @@ describe('No Support', () => {
     });
   });
 
+  describe('.downloadKite()', () => {
+    it('returns a rejected promise', () => {
+      return waitsForPromise({
+        shouldReject: true,
+      }, () => NoSupportAdapter.downloadKite({}));
+    });
+  });
+
   describe('.isKiteRunning()', () => {
     it('returns a rejected promise', () => {
       return waitsForPromise({
