@@ -24,8 +24,18 @@ function fakeKiteInstallPaths(platform) {
         });
         break;
       case 'win32':
+        commandsRestore = fakeCommands({
+          'tasklist': (ps) => {
+            ps.stdout('');
+            return 0;
+          },
+          'C:\\Windows\\Kite.exe': (ps) => {
+            ps.stdout('');
+            return 1;
+          },
+        });
         if (!WindowsSupport) {
-          WindowsSupport = require('../lib/support/windows');
+          WindowsSupport = require('../../lib/support/windows');
         }
         safePaths = WindowsSupport.KITE_EXE_PATH;
         WindowsSupport.KITE_EXE_PATH = 'C:\\Windows\\Kite.exe';
@@ -34,10 +44,8 @@ function fakeKiteInstallPaths(platform) {
   });
 
   afterEach(() => {
+    commandsRestore && commandsRestore.restore();
     switch (platform) {
-      case 'darwin':
-        commandsRestore.restore();
-        break;
       case 'win32':
         WindowsSupport.KITE_EXE_PATH = safePaths;
         break;
@@ -64,6 +72,12 @@ function withKiteInstalled(platform, block) {
           });
           break;
         case 'win32':
+          commandsRestore = fakeCommands({
+            [__filename]: (ps) => {
+              ps.stdout('');
+              return 0;
+            },
+          });
           if (!WindowsSupport) {
             WindowsSupport = require('../lib/support/windows');
           }
