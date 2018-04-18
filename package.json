@@ -19,7 +19,7 @@
     "lint:fix": "eslint --fix .",
     "lint": "eslint .",
     "lcov_report": "nyc report --reporter=lcov",
-    "test": "nyc mocha --timeout 5000 --recursive test/**/*.test.js"
+    "test": "nyc mocha --timeout 5000 --recursive test/*.test.js test/**/*.test.js"
   },
   "dependencies": {
     "analytics-node": "^3.1.1",
