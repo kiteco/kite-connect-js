@@ -1,3 +1,5 @@
+'use strict';
+
 const proc = require('child_process');
 const sinon = require('sinon');
 const {merge} = require('./utils');

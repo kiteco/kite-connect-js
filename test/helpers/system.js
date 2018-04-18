@@ -1,3 +1,5 @@
+'use strict';
+
 let WindowsSupport;
 
 const os = require('os');

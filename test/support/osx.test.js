@@ -1,4 +1,3 @@
-
 'use strict';
 
 const proc = require('child_process');
