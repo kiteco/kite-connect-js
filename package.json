@@ -1,14 +1,14 @@
 {
-  "name": "kite-connector",
+  "name": "kite-connect",
   "version": "0.0.0",
   "description": "API methods to access Kite",
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/kiteco/kite-connector-js.git"
+    "url": "git://github.com/kiteco/kite-connect-js.git"
   },
-  "bugs": "http://github.com/kiteco/kite-connector-js/issues",
-  "commits": "http://github.com/kiteco/kite-connector-js/commits",
+  "bugs": "http://github.com/kiteco/kite-connect-js/issues",
+  "commits": "http://github.com/kiteco/kite-connect-js/commits",
   "contributors": [
     {
       "name": "Cédric Néhémie",

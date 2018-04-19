@@ -1,3 +1,3 @@
-## Kite JS Connector
+## Kite JS Connect
 
 [![Build Status](https://travis-ci.org/kiteco/kite-connect-js.svg?branch=master)](https://travis-ci.org/kiteco/kite-connect-js)
