@@ -42,8 +42,8 @@ describe('TestAdapter', () => {
     ['hasManyKiteInstallation', {allInstallPath: ['foo', 'bar']}, true],
     ['hasManyKiteEnterpriseInstallation', {allEnterpriseInstallPath: ['foo']}, false],
     ['hasManyKiteEnterpriseInstallation', {allEnterpriseInstallPath: ['foo', 'bar']}, true],
-    ['installKite', {install: true}, false],
-    ['installKite', {install: false}, true],
+    ['installKite', {installed: true}, false],
+    ['installKite', {installed: false}, true],
     ['runKite', {running: true}, false],
     ['runKite', {running: false}, true],
   ].forEach(([method, settings, expected]) => {
@@ -58,9 +58,9 @@ describe('TestAdapter', () => {
 
   [
     ['isAdmin', 'admin'],
-    ['isKiteSupported', 'kiteSupported'],
-    ['isOSSupported', 'osSupported'],
-    ['isOSVersionSupported', 'osVersionSupported'],
+    ['isKiteSupported', 'supported'],
+    ['isOSSupported', 'supported'],
+    ['isOSVersionSupported', 'supported'],
   ].forEach(([method, setting]) => {
     describe(`.${method}()`, () => {
       describe(`when setup with ${setting}: true`, () => {
@@ -79,7 +79,7 @@ describe('TestAdapter', () => {
 
   [
     ['downloadKite', 'canDownload'],
-    ['isKiteInstalled', 'install'],
+    ['isKiteInstalled', 'installed'],
     ['isKiteRunning', 'running'],
     ['runKiteEnterprise', 'canRunEnterprise'],
     ['isKiteEnterpriseInstalled', 'installEnterprise'],
@@ -101,10 +101,10 @@ describe('TestAdapter', () => {
   });
 
   describe('.hasBothKiteInstalled()', () => {
-    describe('when setup with only install: true', () => {
+    describe('when setup with only installed: true', () => {
       it('returns a rejected promise', () => {
         return waitsForPromise({shouldReject: true},
-          () => testAdapter({install: true}).hasBothKiteInstalled());
+          () => testAdapter({installed: true}).hasBothKiteInstalled());
       });
     });
 
@@ -115,10 +115,10 @@ describe('TestAdapter', () => {
       });
     });
 
-    describe('when setup with both install: true and installEnterprise: true', () => {
+    describe('when setup with both installed: true and installEnterprise: true', () => {
       it('returns a resolved promise', () => {
         return waitsForPromise(() =>
-          testAdapter({installEnterprise: true, install: true}).hasBothKiteInstalled());
+          testAdapter({installEnterprise: true, installed: true}).hasBothKiteInstalled());
       });
     });
   });

@@ -5,11 +5,9 @@ const testAdapter = require('../../lib/support/test-adapter');
 const {deepMerge} = require('../../lib/utils');
 
 const DEFAULT_SETUP = {
-  install: true,
+  supported: true,
+  installed: true,
   running: true,
-  kiteSupported: true,
-  osSupported: true,
-  osVersionSupported: true,
 };
 
 function join(arr) {
@@ -26,14 +24,21 @@ function join(arr) {
 
 function setupDescription(setup) {
   const states = [];
+  const finalize = () => `with kite ${join(states)}`;
 
-  states.push(setup.install ? 'installed' : 'not installed');
+  states.push(setup.supported ? 'supported' : 'not supported');
+  if (!setup.supported) { return finalize(); }
+
+  states.push(setup.installed ? 'installed' : 'not installed');
+  if (!setup.installed) { return finalize(); }
+
   states.push(setup.running ? 'running' : 'not running');
+  if (!setup.running) { return finalize(); }
 
-  return `with kite ${join(states)}`;
+  return finalize();
 }
 
-function withSetup(setup, block) {
+function withKite(setup, block) {
   setup = deepMerge(DEFAULT_SETUP, setup);
 
   describe(setupDescription(setup), () => {
@@ -51,4 +56,4 @@ function withSetup(setup, block) {
   });
 }
 
-module.exports = {withSetup};
+module.exports = {withKite};

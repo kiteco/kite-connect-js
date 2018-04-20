@@ -64,7 +64,7 @@ describe('WindowsAdapter', () => {
         describe('with the install option', () => {
           it('returns a promise resolved after the install', () => {
             const options = {
-              install: true,
+              installed: true,
               onDownload: sinon.spy(),
               onInstallStart: sinon.spy(),
               onCopy: sinon.spy(),

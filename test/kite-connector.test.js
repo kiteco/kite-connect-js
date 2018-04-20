@@ -5,7 +5,7 @@
 const {KiteConnector} = require('../lib');
 
 const {waitsForPromise} = require('./helpers/async');
-const {withSetup} = require('./helpers/support');
+const {withKite} = require('./helpers/support');
 // const {fakeRequestMethod, fakeResponse, withFakeServer, withRoutes} = require('./helpers/http');
 // const {
 //   fakeKiteInstallPaths,
@@ -16,8 +16,9 @@ const {withSetup} = require('./helpers/support');
 // } = require('./helpers/system');
 
 describe('KiteConnector', () => {
+
   describe('.canInstallKite()', () => {
-    withSetup({install: true}, () => {
+    withKite({supported: false}, () => {
       it('returns a rejected promise', () => {
         return waitsForPromise({
           shouldReject: true,
@@ -25,7 +26,15 @@ describe('KiteConnector', () => {
       });
     });
 
-    withSetup({install: false}, () => {
+    withKite({installed: true}, () => {
+      it('returns a rejected promise', () => {
+        return waitsForPromise({
+          shouldReject: true,
+        }, () => KiteConnector.canInstallKite());
+      });
+    });
+
+    withKite({installed: false}, () => {
       it('returns a resolved promise', () => {
         return waitsForPromise(() => KiteConnector.canInstallKite());
       });
