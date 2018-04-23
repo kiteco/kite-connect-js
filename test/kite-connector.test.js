@@ -60,6 +60,35 @@ describe('KiteConnector', () => {
     });
   });
 
+  describe('.isUserAuthenticated()', () => {
+    withKite({logged: false}, () => {
+      it('returns a rejected promise', () => {
+        return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated());
+      });
+    });
+
+    withKite({reachable: true}, () => {
+      describe('when the request ends with another status code', () => {
+        withKiteRoutes([[
+          o => o.path === '/clientapi/user',
+          o => fakeResponse(404),
+        ]]);
+
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated());
+        });
+      });
+    });
+
+    withKite({logged: true}, () => {
+      it('returns a resolving promise', () => {
+        return waitsForPromise(() => KiteConnector.isUserAuthenticated());
+      });
+    });
+
+  });
+
+
   describe('.request()', () => {
     withKite({supported: false}, () => {
       it('returns a rejected promise with the UNSUPPORTED state', () => {
@@ -145,6 +174,20 @@ describe('KiteConnector', () => {
         return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
         .then(err => {
           expect(err.data).to.eql(KiteConnector.STATES.NOT_WHITELISTED);
+        });
+      });
+    });
+
+    withKite({reachable: true}, () => {
+      withKiteRoutes([[
+        o => o.path === '/foo',
+        o => fakeResponse(200),
+      ]]);
+
+      it('returns a resolved promise with the response object', () => {
+        return waitsForPromise(() => KiteConnector.request({path: '/foo'}))
+        .then(resp => {
+          expect(resp.statusCode).to.eql(200);
         });
       });
     });
