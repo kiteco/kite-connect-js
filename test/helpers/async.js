@@ -46,7 +46,10 @@ function waitsForPromise(options, generator) {
 
   return generator()
   .then(() => failed = false)
-  .catch((e) => failed = true)
+  .catch((e) => {
+    failed = true;
+    if (!shouldReject && failed) { console.log(e); }
+  })
   .then(() => expect(failed).to.eql(shouldReject));
 }
 /**
