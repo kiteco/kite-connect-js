@@ -1,13 +1,12 @@
 'use strict';
 
-const http = require('http');
 const sinon = require('sinon');
 const expect = require('expect.js');
 
 const {KiteConnector} = require('../lib');
 const {waitsForPromise} = require('./helpers/async');
-const {withKite} = require('./helpers/support');
-const {fakeRequestMethod} = require('./helpers/http');
+const {withKite, withKiteRoutes} = require('./helpers/support');
+const {fakeResponse} = require('./helpers/http');
 
 describe('KiteConnector', () => {
   let requestStub;
@@ -41,18 +40,13 @@ describe('KiteConnector', () => {
   });
 
   describe('.waitForKite()', () => {
-    withKite({running: true}, () => {
-      beforeEach(() => {
-        requestStub = sinon.stub(http, 'request')
-        .callsFake(fakeRequestMethod(true));
-      });
-
+    withKite({reachable: true}, () => {
       it('returns a resolving promise', () => {
         return waitsForPromise(() => KiteConnector.waitForKite(5, 0));
       });
     });
 
-    withKite({running: false}, () => {
+    withKite({reachable: false}, () => {
       beforeEach(() => {
         sinon.spy(KiteConnector, 'isKiteReachable');
       });
@@ -61,6 +55,71 @@ describe('KiteConnector', () => {
         return waitsForPromise({shouldReject: true}, () => KiteConnector.waitForKite(5, 0))
         .then(() => {
           expect(KiteConnector.isKiteReachable.callCount).to.eql(5);
+        });
+      });
+    });
+  });
+
+  describe('.request()', () => {
+    withKite({supported: false}, () => {
+      it('returns a rejected promise with the UNSUPPORTED state', () => {
+        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
+        .then(err => {
+          expect(err.data).to.eql(KiteConnector.STATES.UNSUPPORTED);
+        });
+      });
+    });
+
+    withKite({supported: true}, () => {
+      it('returns a rejected promise with the UNINSTALLED state', () => {
+        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
+        .then(err => {
+          expect(err.data).to.eql(KiteConnector.STATES.UNINSTALLED);
+        });
+      });
+    });
+
+    withKite({installed: true}, () => {
+      it('returns a rejected promise with the NOT_RUNNING state', () => {
+        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
+        .then(err => {
+          expect(err.data).to.eql(KiteConnector.STATES.NOT_RUNNING);
+        });
+      });
+    });
+
+    withKite({running: true}, () => {
+      it('returns a rejected promise with the UNREACHABLE state', () => {
+        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
+        .then(err => {
+          expect(err.data).to.eql(KiteConnector.STATES.UNREACHABLE);
+        });
+      });
+    });
+
+    withKite({reachable: true}, () => {
+      withKiteRoutes([[
+        o => o.path === '/foo',
+        o => fakeResponse(401),
+      ]]);
+      it('returns a rejected promise with the UNLOGGED state', () => {
+        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
+        .then(err => {
+          expect(err.data).to.eql(KiteConnector.STATES.UNLOGGED);
+        });
+      });
+    });
+
+    withKite({reachable: true}, () => {
+      withKiteRoutes([[
+        o => o.path === '/foo',
+        o => fakeResponse(403),
+      ]]);
+
+      it('returns a rejected promise with the NOT_WHITELISTED state', () => {
+        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
+        .then(err => {
+          expect(err.data).to.eql(KiteConnector.STATES.NOT_WHITELISTED);
         });
       });
     });
