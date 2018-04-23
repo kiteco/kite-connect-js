@@ -24,8 +24,17 @@ function join(arr) {
 
 function setupDescription(setup) {
   const states = [];
+
+  // return the call to this function to generate the test case description
   const finalize = () => `with kite ${join(states)}`;
 
+  // We want to make setup as simple as possible, by only setting
+  // running we're also saying "kite is installed on a supported platform"
+  if (setup.running != undefined && setup.installed == undefined) { setup.installed = true; }
+  if (setup.installed != undefined && setup.supported == undefined) { setup.supported = true; }
+
+  // We're building the description by walking through the meaningful
+  // states in the option, we return quickly to avoid cluttered descriptions
   states.push(setup.supported ? 'supported' : 'not supported');
   if (!setup.supported) { return finalize(); }
 
