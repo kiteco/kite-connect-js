@@ -68,6 +68,31 @@ describe('KiteConnector', () => {
           expect(err.data).to.eql(KiteConnector.STATES.UNSUPPORTED);
         });
       });
+
+      describe('with a onDidFailRequest listener', () => {
+        let failSpy, disposable;
+        beforeEach(() => {
+          failSpy = sinon.spy();
+          disposable = KiteConnector.onDidFailRequest(failSpy);
+        });
+
+        it('unregisters the listener when calling dispose() on the disposable', () => {
+          disposable.dispose();
+
+          return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
+          .then(() => {
+            expect(failSpy.called).not.to.be.ok();
+          });
+        });
+
+        it('notifies the listener of the failure', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
+          .then(() => {
+            expect(failSpy.called).to.be.ok();
+            expect(failSpy.lastCall.args[0].data).to.eql(KiteConnector.STATES.UNSUPPORTED);
+          });
+        });
+      });
     });
 
     withKite({supported: true}, () => {
