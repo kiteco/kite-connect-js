@@ -181,6 +181,22 @@ describe('KiteConnector', () => {
     withKite({reachable: true}, () => {
       withKiteRoutes([[
         o => o.path === '/foo',
+        o => fakeResponse(404, 'not found'),
+      ]]);
+
+      it('returns a rejected promise with the NOT_WHITELISTED state', () => {
+        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
+        .then(err => {
+          expect(err.type).to.eql('bad_status');
+          expect(err.data).to.eql(404);
+          expect(err.content).to.eql('not found');
+        });
+      });
+    });
+
+    withKite({reachable: true}, () => {
+      withKiteRoutes([[
+        o => o.path === '/foo',
         o => fakeResponse(200),
       ]]);
 
