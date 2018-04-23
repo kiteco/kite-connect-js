@@ -3,13 +3,7 @@
 const {KiteConnector} = require('../../lib');
 const testAdapter = require('../../lib/support/test-adapter');
 const TestClient = require('../../lib/clients/test-client');
-const {deepMerge} = require('../../lib/utils');
-
-const DEFAULT_SETUP = {
-  supported: true,
-  installed: true,
-  running: true,
-};
+const {fakeResponse} = require('./http');
 
 function join(arr) {
   return arr.reduce((m, v, i, a) => {
@@ -27,12 +21,14 @@ function setupDescription(setup) {
   const states = [];
 
   // return the call to this function to generate the test case description
-  const finalize = () => `with kite ${join(states)}`;
+  const finalize = (str) => `with kite ${str || join(states)}`;
 
-  // We want to make setup as simple as possible, by only setting
-  // running we're also saying "kite is installed on a supported platform"
-  if (setup.running != undefined && setup.installed == undefined) { setup.installed = true; }
-  if (setup.installed != undefined && setup.supported == undefined) { setup.supported = true; }
+  // Special cases for when a state is true, we're shortening the description
+  // with only that state
+  if (setup.logged) { return finalize('logged'); }
+  if (setup.reachable) { return finalize('reachable'); }
+  if (setup.running) { return finalize('running'); }
+  if (setup.installed) { return finalize('installed'); }
 
   // We're building the description by walking through the meaningful
   // states in the option, we return quickly to avoid cluttered descriptions
@@ -49,7 +45,12 @@ function setupDescription(setup) {
 }
 
 function withKite(setup, block) {
-  setup = deepMerge(DEFAULT_SETUP, setup);
+  // We want to make setup as simple as possible, by only setting
+  // running we're also saying "kite is installed on a supported platform"
+  if (setup.logged != undefined && setup.reachable == undefined) { setup.reachable = true; }
+  if (setup.reachable != undefined && setup.running == undefined) { setup.running = true; }
+  if (setup.running != undefined && setup.installed == undefined) { setup.installed = true; }
+  if (setup.installed != undefined && setup.supported == undefined) { setup.supported = true; }
 
   describe(setupDescription(setup), () => {
     let safeAdapter, safeClient;
@@ -60,10 +61,15 @@ function withKite(setup, block) {
       KiteConnector.adapter = testAdapter(setup);
       KiteConnector.client = new TestClient();
 
-      if (setup) {
+      if (!setup.reachable) {
         KiteConnector.client.addRoute([
           o => true,
           o => { throw new Error(); },
+        ]);
+      } else {
+        KiteConnector.client.addRoute([
+          o => o.path === '/clientapi/user',
+          o => setup.logged ? fakeResponse(200) : fakeResponse(401),
         ]);
       }
     });
@@ -77,4 +83,15 @@ function withKite(setup, block) {
   });
 }
 
-module.exports = {withKite};
+function withKiteRoutes(routes = [], block = (() => {})) {
+  beforeEach(() => {
+    routes.forEach(route => KiteConnector.client.addRoute(route));
+  });
+
+  block();
+}
+
+module.exports = {
+  withKite,
+  withKiteRoutes,
+};

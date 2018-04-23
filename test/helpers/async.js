@@ -42,20 +42,20 @@ function waitsForPromise(options, generator) {
   }
 
   const shouldReject = !!options.shouldReject;
-  let failed, results;
+  let state, results;
 
   return generator()
   .then(res => {
-    failed = false;
+    state = 'resolved';
     results = res;
   })
   .catch(err => {
-    failed = true;
+    state = 'rejected';
     results = err;
-    if (!shouldReject && failed) { console.log(err); }
+    if (!shouldReject && state === 'rejected') { console.log(err); }
   })
   .then(() => {
-    expect(failed).to.eql(shouldReject);
+    expect(state).to.eql(shouldReject ? 'rejected' : 'resolved');
     return results;
   });
 }
