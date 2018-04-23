@@ -39,6 +39,7 @@ function fakeResponse(statusCode, data, props) {
           break;
       }
     },
+    data,
   };
   for (let k in props) { resp[k] = props[k]; }
   resp.headers = resp.headers || {};
@@ -119,10 +120,10 @@ function fakeRequestMethod(resp) {
  * function will be invoked.
  */
 function fakeRouter(routes) {
-  return (opts) => {
+  return (opts, data, timeout) => {
     for (let i = 0; i < routes.length; i++) {
       const [predicate, handler] = routes[i];
-      if (predicate(opts)) { return handler(opts); }
+      if (predicate(opts, data, timeout)) { return handler(opts, data, timeout); }
     }
     return fakeResponse(404);
   };

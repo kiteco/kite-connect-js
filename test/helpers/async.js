@@ -42,15 +42,22 @@ function waitsForPromise(options, generator) {
   }
 
   const shouldReject = !!options.shouldReject;
-  let failed;
+  let failed, results;
 
   return generator()
-  .then(() => failed = false)
-  .catch((e) => {
-    failed = true;
-    if (!shouldReject && failed) { console.log(e); }
+  .then(res => {
+    failed = false;
+    results = res;
   })
-  .then(() => expect(failed).to.eql(shouldReject));
+  .catch(err => {
+    failed = true;
+    results = err;
+    if (!shouldReject && failed) { console.log(err); }
+  })
+  .then(() => {
+    expect(failed).to.eql(shouldReject);
+    return results;
+  });
 }
 /**
  * A waitsFor condition that only evaluates to true after a given duration.

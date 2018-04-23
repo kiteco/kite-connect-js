@@ -2,6 +2,7 @@
 
 const {KiteConnector} = require('../../lib');
 const testAdapter = require('../../lib/support/test-adapter');
+const TestClient = require('../../lib/clients/test-client');
 const {deepMerge} = require('../../lib/utils');
 
 const DEFAULT_SETUP = {
@@ -51,14 +52,25 @@ function withKite(setup, block) {
   setup = deepMerge(DEFAULT_SETUP, setup);
 
   describe(setupDescription(setup), () => {
-    let safeAdapter;
+    let safeAdapter, safeClient;
     beforeEach(() => {
       safeAdapter = KiteConnector.adapter;
+      safeClient = KiteConnector.client;
+
       KiteConnector.adapter = testAdapter(setup);
+      KiteConnector.client = new TestClient();
+
+      if (setup) {
+        KiteConnector.client.addRoute([
+          o => true,
+          o => { throw new Error(); },
+        ]);
+      }
     });
 
     afterEach(() => {
       KiteConnector.adapter = safeAdapter;
+      KiteConnector.client = safeClient;
     });
 
     block();
