@@ -208,4 +208,72 @@ describe('KiteConnector', () => {
       });
     });
   });
+
+  describe('.checkHealth()', () => {
+    withKite({supported: false}, () => {
+      it('returns a promise resolved with the corresponding state', () => {
+        return waitsForPromise(() => KiteConnector.checkHealth())
+        .then(state => {
+          expect(state).to.eql(KiteConnector.STATES.UNSUPPORTED);
+        });
+      });
+    });
+
+    withKite({installed: false}, () => {
+      it('returns a promise resolved with the corresponding state', () => {
+        return waitsForPromise(() => KiteConnector.checkHealth())
+        .then(state => {
+          expect(state).to.eql(KiteConnector.STATES.UNINSTALLED);
+        });
+      });
+    });
+
+    withKite({running: false}, () => {
+      it('returns a promise resolved with the corresponding state', () => {
+        return waitsForPromise(() => KiteConnector.checkHealth())
+        .then(state => {
+          expect(state).to.eql(KiteConnector.STATES.INSTALLED);
+        });
+      });
+    });
+
+    withKite({reachable: false}, () => {
+      it('returns a promise resolved with the corresponding state', () => {
+        return waitsForPromise(() => KiteConnector.checkHealth())
+        .then(state => {
+          expect(state).to.eql(KiteConnector.STATES.RUNNING);
+        });
+      });
+    });
+
+    withKite({logged: false}, () => {
+      it('returns a promise resolved with the corresponding state', () => {
+        return waitsForPromise(() => KiteConnector.checkHealth())
+        .then(state => {
+          expect(state).to.eql(KiteConnector.STATES.REACHABLE);
+        });
+      });
+    });
+
+    withKite({reachable: true}, () => {
+      withKiteRoutes([[
+        o => o.path === '/clientapi/user',
+        o => fakeResponse(500),
+      ]]);
+      describe('and an unexpected response from Kite', () => {
+        it('returns a rejected promise', () => {
+          return waitsForPromise({shouldReject: true}, () => KiteConnector.checkHealth());
+        });
+      });
+    });
+
+    withKite({logged: true}, () => {
+      it('returns a promise resolved with the corresponding state', () => {
+        return waitsForPromise(() => KiteConnector.checkHealth())
+        .then(state => {
+          expect(state).to.eql(KiteConnector.STATES.AUTHENTICATED);
+        });
+      });
+    });
+  });
 });
