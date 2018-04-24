@@ -84,6 +84,27 @@ describe('withKite', () => {
     });
   });
 
+  withKite({installedEnterprise: true}, () => {
+    it('is supported', () => {
+      return waitsForPromise(() => KiteConnector.isKiteSupported());
+    });
+    it('community Kite is installed', () => {
+      return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteInstalled());
+    });
+    it('enterprise Kite is installed', () => {
+      return waitsForPromise(() => KiteConnector.isKiteEnterpriseInstalled());
+    });
+    it('enterprise Kite is not running', () => {
+      return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteEnterpriseRunning());
+    });
+    it('is not reachable', () => {
+      return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteReachable());
+    });
+    it('is not logged', () => {
+      return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated());
+    });
+  });
+
   withKite({running: true}, () => {
     it('is supported', () => {
       return waitsForPromise(() => KiteConnector.isKiteSupported());
@@ -93,6 +114,33 @@ describe('withKite', () => {
     });
     it('is running', () => {
       return waitsForPromise(() => KiteConnector.isKiteRunning());
+    });
+    it('is not reachable', () => {
+      return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteReachable());
+    });
+    it('is not logged', () => {
+      return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated())
+      .then(err => {
+        expect(err.data).to.eql(KiteConnector.STATES.UNREACHABLE);
+      });
+    });
+  });
+
+  withKite({runningEnterprise: true}, () => {
+    it('is supported', () => {
+      return waitsForPromise(() => KiteConnector.isKiteSupported());
+    });
+    it('community Kite is not installed', () => {
+      return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteInstalled());
+    });
+    it('community Kite is not running', () => {
+      return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteRunning());
+    });
+    it('enterprise Kite is installed', () => {
+      return waitsForPromise(() => KiteConnector.isKiteEnterpriseInstalled());
+    });
+    it('enterprise Kite is running', () => {
+      return waitsForPromise(() => KiteConnector.isKiteEnterpriseRunning());
     });
     it('is not reachable', () => {
       return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteReachable());

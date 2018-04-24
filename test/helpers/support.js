@@ -23,23 +23,26 @@ function setupDescription(setup) {
   // return the call to this function to generate the test case description
   const finalize = (str) => `with kite ${str || join(states)}`;
 
+  const installed = setup.installed || setup.installedEnterprise;
+  const running = setup.running || setup.runningEnterprise;
+
   // Special cases for when a state is true, we're shortening the description
   // with only that state
   if (setup.logged) { return finalize('logged'); }
   if (setup.reachable) { return finalize('reachable'); }
-  if (setup.running) { return finalize('running'); }
-  if (setup.installed) { return finalize('installed'); }
+  if (running) { return finalize('running'); }
+  if (installed) { return finalize('installed'); }
 
   // We're building the description by walking through the meaningful
   // states in the option, we return quickly to avoid cluttered descriptions
   states.push(setup.supported ? 'supported' : 'not supported');
   if (!setup.supported) { return finalize(); }
 
-  states.push(setup.installed ? 'installed' : 'not installed');
-  if (!setup.installed) { return finalize(); }
+  states.push(installed ? 'installed' : 'not installed');
+  if (!installed) { return finalize(); }
 
-  states.push(setup.running ? 'running' : 'not running');
-  if (!setup.running) { return finalize(); }
+  states.push(running ? 'running' : 'not running');
+  if (!running) { return finalize(); }
 
   return finalize();
 }
@@ -50,13 +53,16 @@ function withKite(setup, block) {
   if (setup.logged != undefined && setup.reachable == undefined) { setup.reachable = true; }
   if (setup.reachable != undefined && setup.running == undefined) { setup.running = true; }
   if (setup.running != undefined && setup.installed == undefined) { setup.installed = true; }
+  if (setup.runningEnterprise != undefined && setup.installedEnterprise == undefined) { setup.installedEnterprise = true; }
   if (setup.installed != undefined && setup.supported == undefined) { setup.supported = true; }
+  if (setup.installedEnterprise != undefined && setup.supported == undefined) { setup.supported = true; }
 
   // Also, we want to make sure the adapter is in legal state.
   // For instance, if the platform is not supported you can't have kite installed on it
   if (!setup.supported) { setup.installed = false; }
   if (!setup.installed) { setup.running = false; }
-  if (!setup.running) { setup.reachable = false; }
+  if (!setup.installedEnterprise) { setup.runningEnterprise = false; }
+  if (!(setup.running || setup.runningEnterprise)) { setup.reachable = false; }
   if (!setup.reachable) { setup.logged = false; }
 
   describe(setupDescription(setup), () => {
