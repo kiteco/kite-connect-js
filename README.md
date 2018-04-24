@@ -286,4 +286,49 @@ describe('some test suite', () => {
 |`allInstallPaths`|`array`|Description|
 |`allEnterpriseInstallPaths`|`array`|Description|
 
-#### withKiteRoutes()
+#### withKiteRoutes(routes, block)
+
+You can use the `withKiteRoutes` within a `withKite` block to define
+routes and responses that the test server will respond to requests.
+
+Depending on whether you provided a `block` or not, the routes will apply to all the tests at the same level as your call or only to those created inside the provided function.
+
+```js
+const {withKite, withKiteRoutes} = require('kite-connect-js/test/helpers/support');
+const {fakeResponse} = require('kite-connect-js/test/helpers/http');
+
+withKite({...}, () => {
+  // All the tests at this level will have access to these routes.
+  // As no function has been passed, only a beforeEach hook have been created
+  withKiteRoutes([
+    [
+      o => o.path === '/languages',
+      o => fakeResponse(200, someJSONFixture),
+    ], [
+      o => /^\/some-endpoint-with-params\?/.test(o.path),
+      o => fakeResponse(200, someJSONFixture),
+    ]
+  ]);
+
+  // calling '/languages' gives 200
+});
+```
+
+```js
+const {withKite, withKiteRoutes} = require('kite-connect-js/test/helpers/support');
+const {fakeResponse} = require('kite-connect-js/test/helpers/http');
+
+withKite({...}, () => {
+  // As a function has been passed to the helper as second argument,
+  // a describe block has been created and only the tests
+  // in this function will get a 200
+  withKiteRoutes([[
+    o => o.path === '/languages',
+    o => fakeResponse(200),
+  ]], () => {
+    // calling '/languages' gives 200
+  });
+
+  // calling '/languages' gives 404
+});
+```
