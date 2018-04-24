@@ -1,6 +1,6 @@
 'use strict';
 
-const {KiteConnector} = require('../../lib');
+const KiteConnector = require('../../lib');
 const testAdapter = require('../../lib/support/test-adapter');
 const TestClient = require('../../lib/clients/test-client');
 const {fakeResponse} = require('./http');

@@ -3,7 +3,7 @@
 const sinon = require('sinon');
 const expect = require('expect.js');
 
-const {KiteConnector} = require('../lib');
+const KiteConnector = require('../lib');
 const {waitsForPromise} = require('./helpers/async');
 const {withKite, withKiteRoutes} = require('./helpers/support');
 const {fakeResponse} = require('./helpers/http');

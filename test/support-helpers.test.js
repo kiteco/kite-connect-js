@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('expect.js');
-const {KiteConnector} = require('../lib');
+const KiteConnector = require('../lib');
 const {withKite} = require('./helpers/support');
 const {waitsForPromise} = require('./helpers/async');
 
