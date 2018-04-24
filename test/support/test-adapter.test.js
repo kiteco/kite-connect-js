@@ -91,6 +91,7 @@ describe('TestAdapter', () => {
 
   [
     ['downloadKite', 'canDownload'],
+    ['downloadKiteRelease', 'canDownload'],
     ['isKiteInstalled', 'installed'],
     ['isKiteRunning', 'running'],
     ['isKiteEnterpriseInstalled', 'installedEnterprise'],

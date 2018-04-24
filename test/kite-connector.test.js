@@ -151,17 +151,19 @@ describe('KiteConnector', () => {
     describe(`.${method}()`, () => {
       let stub;
 
-      beforeEach(() => {
-        stub = sinon.stub(KiteConnector.adapter, method).callsFake(() => {});
-      });
+      withKite({}, () => {
+        beforeEach(() => {
+          stub = sinon.stub(KiteConnector.adapter, method).callsFake(() => {});
+        });
 
-      afterEach(() => {
-        stub.restore();
-      });
+        afterEach(() => {
+          stub.restore();
+        });
 
-      it('delegates the call to the adapter', () => {
-        KiteConnector[method](...args);
-        expect(KiteConnector.adapter[method].calledWith(...args)).to.be.ok();
+        it('delegates the call to the adapter', () => {
+          KiteConnector[method](...args);
+          expect(KiteConnector.adapter[method].calledWith(...args)).to.be.ok();
+        });
       });
     });
   });
