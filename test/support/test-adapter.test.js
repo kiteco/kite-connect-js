@@ -41,6 +41,17 @@ describe('TestAdapter', () => {
     ['hasManyKiteInstallation', {allInstallPaths: ['foo', 'bar']}, true],
     ['hasManyKiteEnterpriseInstallation', {allEnterpriseInstallPaths: ['foo']}, false],
     ['hasManyKiteEnterpriseInstallation', {allEnterpriseInstallPaths: ['foo', 'bar']}, true],
+  ].forEach(([method, settings, expected]) => {
+    describe(`.${method}()`, () => {
+      describe(`when setup with ${JSON.stringify(settings)}`, () => {
+        it(`returns ${expected}`, () => {
+          expect(testAdapter(settings)[method]()).to.eql(expected);
+        });
+      });
+    });
+  });
+
+  [
     ['installKite', {installed: true}, false],
     ['installKite', {installed: false}, true],
     ['runKite', {running: true}, false],
@@ -51,7 +62,7 @@ describe('TestAdapter', () => {
     describe(`.${method}()`, () => {
       describe(`when setup with ${JSON.stringify(settings)}`, () => {
         it(`returns ${expected}`, () => {
-          expect(testAdapter(settings)[method]()).to.eql(expected);
+          return waitsForPromise({shouldReject: !expected}, () => testAdapter(settings)[method]());
         });
       });
     });
