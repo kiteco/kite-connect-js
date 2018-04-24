@@ -98,12 +98,23 @@ function withKite(setup, block) {
   });
 }
 
-function withKiteRoutes(routes = [], block = (() => {})) {
+function withKiteRoutes(routes = [], block) {
   beforeEach(() => {
     routes.forEach(route => KiteConnector.client.addRoute(route));
   });
 
-  block();
+  if (block) {
+    describe('', () => {
+      beforeEach(() => {
+        routes.forEach(route => KiteConnector.client.addRoute(route));
+      });
+      block();
+    });
+  } else {
+    beforeEach(() => {
+      routes.forEach(route => KiteConnector.client.addRoute(route));
+    });
+  }
 }
 
 module.exports = {
