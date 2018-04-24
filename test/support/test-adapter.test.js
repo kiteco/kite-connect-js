@@ -8,8 +8,8 @@ describe('TestAdapter', () => {
   [
     'releaseURL',
     'downloadPath',
-    'allInstallPath',
-    'allEnterpriseInstallPath',
+    'allInstallPaths',
+    'allEnterpriseInstallPaths',
     'sessionFilePath',
   ].forEach(getter => {
     describe(`.${getter} when setup with "foo"`, () => {
@@ -20,27 +20,27 @@ describe('TestAdapter', () => {
   });
 
   describe('.installPath', () => {
-    describe('when setup with allInstallPath: ["foo"]', () => {
+    describe('when setup with allInstallPaths: ["foo"]', () => {
       it('returns "foo"', () => {
-        expect(testAdapter({allInstallPath: ['foo']}).installPath).to.eql('foo');
+        expect(testAdapter({allInstallPaths: ['foo']}).installPath).to.eql('foo');
       });
     });
   });
 
   describe('.enterpriseInstallPath', () => {
-    describe('when setup with allEnterpriseInstallPath: ["foo"]', () => {
+    describe('when setup with allEnterpriseInstallPaths: ["foo"]', () => {
       it('returns "foo"', () => {
-        expect(testAdapter({allEnterpriseInstallPath: ['foo']}).enterpriseInstallPath).to.eql('foo');
+        expect(testAdapter({allEnterpriseInstallPaths: ['foo']}).enterpriseInstallPath).to.eql('foo');
       });
     });
   });
 
   [
     ['arch', {arch: 'foo'}, 'foo'],
-    ['hasManyKiteInstallation', {allInstallPath: ['foo']}, false],
-    ['hasManyKiteInstallation', {allInstallPath: ['foo', 'bar']}, true],
-    ['hasManyKiteEnterpriseInstallation', {allEnterpriseInstallPath: ['foo']}, false],
-    ['hasManyKiteEnterpriseInstallation', {allEnterpriseInstallPath: ['foo', 'bar']}, true],
+    ['hasManyKiteInstallation', {allInstallPaths: ['foo']}, false],
+    ['hasManyKiteInstallation', {allInstallPaths: ['foo', 'bar']}, true],
+    ['hasManyKiteEnterpriseInstallation', {allEnterpriseInstallPaths: ['foo']}, false],
+    ['hasManyKiteEnterpriseInstallation', {allEnterpriseInstallPaths: ['foo', 'bar']}, true],
     ['installKite', {installed: true}, false],
     ['installKite', {installed: false}, true],
     ['runKite', {running: true}, false],

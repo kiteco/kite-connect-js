@@ -39,6 +39,54 @@ describe('KiteConnector', () => {
     });
   });
 
+  describe('.canRunKite()', () => {
+    withKite({installed: false}, () => {
+      it('returns a rejected promise', () => {
+        return waitsForPromise({
+          shouldReject: true,
+        }, () => KiteConnector.canRunKite());
+      });
+    });
+
+    withKite({running: true}, () => {
+      it('returns a rejected promise', () => {
+        return waitsForPromise({
+          shouldReject: true,
+        }, () => KiteConnector.canRunKite());
+      });
+    });
+
+    withKite({running: false}, () => {
+      it('returns a resolved promise', () => {
+        return waitsForPromise(() => KiteConnector.canRunKite());
+      });
+    });
+  });
+
+  describe('.canRunKiteEnterprise()', () => {
+    withKite({installedEnterprise: false}, () => {
+      it('returns a rejected promise', () => {
+        return waitsForPromise({
+          shouldReject: true,
+        }, () => KiteConnector.canRunKiteEnterprise());
+      });
+    });
+
+    withKite({runningEnterprise: true}, () => {
+      it('returns a rejected promise', () => {
+        return waitsForPromise({
+          shouldReject: true,
+        }, () => KiteConnector.canRunKiteEnterprise());
+      });
+    });
+
+    withKite({runningEnterprise: false}, () => {
+      it('returns a resolved promise', () => {
+        return waitsForPromise(() => KiteConnector.canRunKiteEnterprise());
+      });
+    });
+  });
+
   describe('.waitForKite()', () => {
     withKite({reachable: true}, () => {
       it('returns a resolving promise', () => {
