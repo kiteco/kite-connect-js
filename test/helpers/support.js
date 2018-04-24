@@ -53,7 +53,9 @@ function withKite(setup, block) {
   if (setup.logged != undefined && setup.reachable == undefined) { setup.reachable = true; }
   if (setup.reachable != undefined && setup.running == undefined) { setup.running = true; }
   if (setup.running != undefined && setup.installed == undefined) { setup.installed = true; }
-  if (setup.runningEnterprise != undefined && setup.installedEnterprise == undefined) { setup.installedEnterprise = true; }
+  if (setup.runningEnterprise != undefined && setup.installedEnterprise == undefined) {
+    setup.installedEnterprise = true;
+  }
   if (setup.installed != undefined && setup.supported == undefined) { setup.supported = true; }
   if (setup.installedEnterprise != undefined && setup.supported == undefined) { setup.supported = true; }
 
