@@ -11,7 +11,6 @@ describe('TestAdapter', () => {
     'allInstallPath',
     'allEnterpriseInstallPath',
     'sessionFilePath',
-    'localTokenPath',
   ].forEach(getter => {
     describe(`.${getter} when setup with "foo"`, () => {
       it('returns "foo"', () => {
