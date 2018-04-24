@@ -52,6 +52,13 @@ function withKite(setup, block) {
   if (setup.running != undefined && setup.installed == undefined) { setup.installed = true; }
   if (setup.installed != undefined && setup.supported == undefined) { setup.supported = true; }
 
+  // Also, we want to make sure the adapter is in legal state.
+  // For instance, if the platform is not supported you can't have kite installed on it
+  if (!setup.supported) { setup.installed = false; }
+  if (!setup.installed) { setup.running = false; }
+  if (!setup.running) { setup.reachable = false; }
+  if (!setup.reachable) { setup.logged = false; }
+
   describe(setupDescription(setup), () => {
     let safeAdapter, safeClient;
     beforeEach(() => {

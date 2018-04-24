@@ -24,6 +24,30 @@ describe('withKite', () => {
     });
   });
 
+  withKite({
+    supported: false,
+    installed: true,
+    running: true,
+    reachable: true,
+    logged: true,
+  }, () => {
+    it('is not supported', () => {
+      return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteSupported());
+    });
+    it('is not installed', () => {
+      return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteInstalled());
+    });
+    it('is not running', () => {
+      return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteRunning());
+    });
+    it('is not reachable', () => {
+      return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteReachable());
+    });
+    it('is not logged', () => {
+      return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated());
+    });
+  });
+
   withKite({supported: true}, () => {
     it('is supported', () => {
       return waitsForPromise(() => KiteConnector.isKiteSupported());
