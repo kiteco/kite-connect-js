@@ -88,6 +88,33 @@ describe('KiteConnector', () => {
 
   });
 
+  [
+    'isKiteInstalled',
+    'isKiteRunning',
+    'installKite',
+    'runKite',
+    'isKiteEnterpriseInstalled',
+    'isKiteEnterpriseRunning',
+    'runKiteEnterprise',
+    'hasBothKiteInstalled',
+  ].forEach(method => {
+    describe(`.${method}()`, () => {
+      let stub;
+
+      beforeEach(() => {
+        stub = sinon.stub(KiteConnector.adapter, method);
+      });
+
+      afterEach(() => {
+        stub.restore();
+      });
+
+      it('delegates the call to the adapter', () => {
+        KiteConnector[method]();
+        expect(KiteConnector.adapter[method].called).to.be.ok();
+      });
+    });
+  });
 
   describe('.request()', () => {
     withKite({supported: false}, () => {
