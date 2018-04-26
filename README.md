@@ -1,6 +1,6 @@
 # Kite JS Connect
 
-[![Build Status](https://travis-ci.org/kiteco/kite-connect-js.svg?branch=master)](https://travis-ci.org/kiteco/kite-connect-js)
+[![Build Status](https://travis-ci.org/kiteco/kite-connect-js.svg?branch=master)](https://travis-ci.org/kiteco/kite-connect-js) [![codecov](https://codecov.io/gh/kiteco/kite-connect-js/branch/master/graph/badge.svg)](https://codecov.io/gh/kiteco/kite-connect-js)
 
 ## API
 
