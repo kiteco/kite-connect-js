@@ -1,70 +1,60 @@
 'use strict';
 
+const expect = require('expect.js');
 const {waitsForPromise} = require('../helpers/async');
 const NoSupportAdapter = require('../../lib/support/no-support');
 
 describe('No Support', () => {
-  describe('.isKiteInstalled()', () => {
-    it('returns a rejected promise', () => {
-      return waitsForPromise({
-        shouldReject: true,
-      }, () => NoSupportAdapter.isKiteInstalled());
+  [
+    'releaseURL',
+    'downloadPath',
+    'installPath',
+    'allInstallPaths',
+    'enterpriseInstallPath',
+    'allEnterpriseInstallPaths',
+    'sessionFilePath',
+  ].forEach(getter => {
+    describe(`.${getter}`, () => {
+      it('returns null', () => {
+        expect(NoSupportAdapter[getter]).to.be(null);
+      });
     });
   });
 
-  describe('.isKiteEnterpriseInstalled()', () => {
-    it('returns a rejected promise', () => {
-      return waitsForPromise({
-        shouldReject: true,
-      }, () => NoSupportAdapter.isKiteInstalled());
+  [
+    ['hasManyKiteInstallation', false],
+    ['hasManyKiteEnterpriseInstallation', false],
+    ['isAdmin', false],
+    ['arch', null],
+    ['isOSSupported', false],
+    ['isOSVersionSupported', false],
+    ['isKiteSupported', false],
+  ].forEach(([method, expected]) => {
+    describe(`.${method}()`, () => {
+      it(`returns ${expected}`, () => {
+        expect(NoSupportAdapter[method]()).to.eql(expected);
+      });
     });
   });
 
-  describe('.installKite()', () => {
-    it('returns a rejected promise', () => {
-      return waitsForPromise({
-        shouldReject: true,
-      }, () => NoSupportAdapter.installKite());
+  [
+    'isKiteInstalled',
+    'downloadKite',
+    'installKite',
+    'isKiteRunning',
+    'runKite',
+    'hasBothKiteInstalled',
+    'isKiteEnterpriseInstalled',
+    'isKiteEnterpriseRunning',
+    'runKiteEnterprise',
+  ].forEach(method => {
+    describe(`.${method}()`, () => {
+      it('returns a rejected promise', () => {
+        return waitsForPromise({
+          shouldReject: true,
+        }, () => NoSupportAdapter[method]());
+      });
     });
   });
 
-  describe('.downloadKite()', () => {
-    it('returns a rejected promise', () => {
-      return waitsForPromise({
-        shouldReject: true,
-      }, () => NoSupportAdapter.downloadKite({}));
-    });
-  });
-
-  describe('.isKiteRunning()', () => {
-    it('returns a rejected promise', () => {
-      return waitsForPromise({
-        shouldReject: true,
-      }, () => NoSupportAdapter.isKiteRunning());
-    });
-  });
-
-  describe('.runKite()', () => {
-    it('returns a rejected promise', () => {
-      return waitsForPromise({
-        shouldReject: true,
-      }, () => NoSupportAdapter.runKite());
-    });
-  });
-
-  describe('.isKiteEnterpriseRunning()', () => {
-    it('returns a rejected promise', () => {
-      return waitsForPromise({
-        shouldReject: true,
-      }, () => NoSupportAdapter.isKiteRunning());
-    });
-  });
-
-  describe('.runKiteEnterprise()', () => {
-    it('returns a rejected promise', () => {
-      return waitsForPromise({
-        shouldReject: true,
-      }, () => NoSupportAdapter.runKite());
-    });
-  });
 });
