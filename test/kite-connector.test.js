@@ -4,17 +4,13 @@ const sinon = require('sinon');
 const expect = require('expect.js');
 
 const KiteConnector = require('../lib');
+const BrowserClient = require('../lib/clients/browser');
+const NodeClient = require('../lib/clients/node');
 const {waitsForPromise} = require('./helpers/async');
 const {withKite, withKiteRoutes} = require('./helpers/support');
 const {fakeResponse} = require('./helpers/http');
 
 describe('KiteConnector', () => {
-  let requestStub;
-
-  afterEach(() => {
-    requestStub && requestStub.restore();
-  });
-
   describe('.canInstallKite()', () => {
     withKite({supported: false}, () => {
       it('returns a rejected promise', () => {
@@ -352,6 +348,22 @@ describe('KiteConnector', () => {
         .then(state => {
           expect(state).to.eql(KiteConnector.STATES.AUTHENTICATED);
         });
+      });
+    });
+  });
+
+  describe('.toggleRequestDebug()', () => {
+    describe('called with no arguments', () => {
+      it('switches the client back and forth', () => {
+        KiteConnector.toggleRequestDebug();
+        expect(KiteConnector.client instanceof BrowserClient).to.be.ok();
+        expect(KiteConnector.client.hostname).to.eql('localhost');
+        expect(KiteConnector.client.port).to.eql(46624);
+
+        KiteConnector.toggleRequestDebug();
+        expect(KiteConnector.client instanceof NodeClient).to.be.ok();
+        expect(KiteConnector.client.hostname).to.eql('localhost');
+        expect(KiteConnector.client.port).to.eql(46624);
       });
     });
   });
