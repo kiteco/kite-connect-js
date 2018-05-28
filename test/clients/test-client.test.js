@@ -18,6 +18,70 @@ describe('TestClient', () => {
     expect(client.request({path: '/foo'})).to.respondWithStatus(404);
   });
 
+  it('returns a promise-like object that has proper resolve continuation', () => {
+    return waitsForPromise(() => client.request({path: '/foo'})
+      .then(resp => {
+        expect(resp).not.to.be(null);
+        return resp;
+      })
+      .then(resp => {
+        expect(resp).not.to.be(null);
+        return resp;
+      }));
+  });
+
+  it('returns a promise-like object that has proper catch continuation', () => {
+    return waitsForPromise(() => client.request({path: '/foo'})
+      .then(resp => {
+        throw new Error('foo');
+      })
+      .catch(err => {
+        return err.message;
+      })
+      .then(msg => {
+        expect(msg).to.eql('foo');
+      }));
+  });
+  it('returns a promise-like object that has proper catch throwing continuation', () => {
+
+    return waitsForPromise(() => client.request({path: '/foo'})
+      .then(resp => {
+        throw new Error('foo');
+      })
+      .catch(err => {
+        throw new Error('bar');
+      })
+      .catch(err => {
+        expect(err.message).to.eql('bar');
+      }));
+  });
+
+  it('returns a promise-like object that has proper error continuation', () => {
+    return waitsForPromise(() => client.request({path: '/foo'})
+      .then(resp => {
+        throw new Error('foo');
+      })
+      .then(() => {}, err => {
+        return err.message;
+      })
+      .then(msg => {
+        expect(msg).to.eql('foo');
+      }));
+  });
+
+  it('returns a promise-like object that has proper error throwing continuation', () => {
+    return waitsForPromise(() => client.request({path: '/foo'})
+      .then(resp => {
+        throw new Error('foo');
+      })
+      .then(resp => {}, err => {
+        throw new Error('bar');
+      })
+      .catch(err => {
+        expect(err.message).to.eql('bar');
+      }));
+  });
+
   describe('adding a route', () => {
     beforeEach(() => {
       client.addRoute([

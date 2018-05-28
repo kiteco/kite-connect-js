@@ -48,8 +48,7 @@ function waitsForPromise(options, generator) {
   .then(res => {
     state = 'resolved';
     results = res;
-  })
-  .catch(err => {
+  }, err => {
     state = 'rejected';
     results = err;
     if (!shouldReject && state === 'rejected') { console.log(err); }
