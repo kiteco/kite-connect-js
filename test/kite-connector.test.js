@@ -312,6 +312,24 @@ describe('KiteConnector', () => {
       });
     });
 
+    withKite({installedEnterprise: false}, () => {
+      it('returns a promise resolved with the corresponding state', () => {
+        return waitsForPromise(() => KiteConnector.checkHealth())
+        .then(state => {
+          expect(state).to.eql(KiteConnector.STATES.UNINSTALLED);
+        });
+      });
+    });
+
+    withKite({runningEnterprise: false}, () => {
+      it('returns a promise resolved with the corresponding state', () => {
+        return waitsForPromise(() => KiteConnector.checkHealth())
+        .then(state => {
+          expect(state).to.eql(KiteConnector.STATES.INSTALLED);
+        });
+      });
+    });
+
     withKite({reachable: false}, () => {
       it('returns a promise resolved with the corresponding state', () => {
         return waitsForPromise(() => KiteConnector.checkHealth())
