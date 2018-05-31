@@ -257,7 +257,7 @@ This module also provides some test helpers that can be used to ease the process
 You can use the `withKite` helper to create a test suite for a specific state of Kite.
 
 ```js
-const {withKite} = require('kite-connect-js/test/helpers/support');
+const {withKite} = require('kite-connect-js/test/helpers/kite');
 
 describe('some test suite', () => {
   withKite({logged: true}, () => {
@@ -294,7 +294,7 @@ routes and responses that the test server will respond to requests.
 Depending on whether you provided a `block` or not, the routes will apply to all the tests at the same level as your call or only to those created inside the provided function.
 
 ```js
-const {withKite, withKiteRoutes} = require('kite-connect-js/test/helpers/support');
+const {withKite, withKiteRoutes} = require('kite-connect-js/test/helpers/kite');
 const {fakeResponse} = require('kite-connect-js/test/helpers/http');
 
 withKite({...}, () => {
@@ -315,7 +315,7 @@ withKite({...}, () => {
 ```
 
 ```js
-const {withKite, withKiteRoutes} = require('kite-connect-js/test/helpers/support');
+const {withKite, withKiteRoutes} = require('kite-connect-js/test/helpers/kite');
 const {fakeResponse} = require('kite-connect-js/test/helpers/http');
 
 withKite({...}, () => {

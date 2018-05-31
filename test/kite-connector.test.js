@@ -7,7 +7,7 @@ const KiteConnector = require('../lib');
 const BrowserClient = require('../lib/clients/browser');
 const NodeClient = require('../lib/clients/node');
 const {waitsForPromise} = require('./helpers/async');
-const {withKite, withKiteRoutes} = require('./helpers/support');
+const {withKite, withKiteRoutes} = require('./helpers/kite');
 const {fakeResponse} = require('./helpers/http');
 
 describe('KiteConnector', () => {

@@ -2,7 +2,7 @@
 
 const expect = require('expect.js');
 const KiteConnector = require('../lib');
-const {withKite} = require('./helpers/support');
+const {withKite} = require('./helpers/kite');
 const {waitsForPromise} = require('./helpers/async');
 
 describe('withKite', () => {
