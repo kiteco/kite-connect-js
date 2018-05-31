@@ -99,10 +99,6 @@ function withKite(setup, block) {
 }
 
 function withKiteRoutes(routes = [], block) {
-  beforeEach(() => {
-    routes.forEach(route => KiteConnector.client.addRoute(route));
-  });
-
   if (block) {
     describe('', () => {
       beforeEach(() => {
