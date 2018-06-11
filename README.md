@@ -80,6 +80,10 @@ const disposable = KiteConnector.onDidFailRequest(err => {
 disposable.dispose();
 ```
 
+#### .toggleRequestDebug()
+
+When using the `kite-connect` module in an electron app, you can use this function to switch all requests to `XMLHttpRequest` instead of node's `http` module. It allows you to access all requests using chromium's devtools Network panel.
+
 #### .isKiteSupported()
 
 Returns a promise that resolves if the current OS is supported by Kite. The test is delegated to the underlying adapter object which will handle test for the OS version and architecture when needed.
