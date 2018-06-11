@@ -16,7 +16,7 @@ No other configuration is required, the object will automatically select the pro
 
 #### .checkHealth()
 
-This function returns a promise that resolves with an integer corresponding to the state of Kite on the user system (see [KiteConnector.STATES](#-states) for details of all possible values).
+This function returns a promise that resolves with an integer corresponding to the state of Kite on the user system (see [KiteConnector.STATES](#states) for details of all possible values).
 
 The promise can end up rejected when encountering an unknown state.
 
@@ -144,7 +144,7 @@ KiteConnector.downloadKiteRelease(options)
 
 |Option|Description|
 |---|---|
-|`install`|Whether or not install Kite at the end of the download. If `true` [`installKite`](#-installkite) will be called at the end of the install process with the same options it received|
+|`install`|Whether or not install Kite at the end of the download. If `true` [`installKite`](#installkite) will be called at the end of the install process with the same options it received|
 |`onDownloadProgress`|A function to be notified during the download process. The function should has this signature `progress(length, total, ratio)`|
 |`onDownload`|A function to be notified when the download process has ended. Depending on the `install` this time can be different than the promise resolution|
 |`onInstallStart`|A function to be notified when the install process starts. This option is only relevant if `install = true`|
@@ -171,7 +171,7 @@ KiteConnector.downloadKite(url, options)
 
 |Option|Description|
 |---|---|
-|`install`|Whether or not install Kite at the end of the download. If `true` [`installKite`](#-installkite) will be called at the end of the install process with the same options it received|
+|`install`|Whether or not install Kite at the end of the download. If `true` [`installKite`](#installkite) will be called at the end of the install process with the same options it received|
 |`onDownloadProgress`|A function to be notified during the download process. The function should has this signature `progress(length, total, ratio)`|
 |`onDownload`|A function to be notified when the download process has ended. Depending on the `install` this time can be different than the promise resolution|
 |`onInstallStart`|A function to be notified when the install process starts. This option is only relevant if `install = true`|
@@ -248,7 +248,6 @@ KiteConnector.runKite()
 
 #### .runKiteAndWait()
 
-
 Starts an already installed Kite, waits until its server can be reached and returns a promise that will resolve if Kite have been successfully started and reached. The start operation is delegated to the underlying adapter object which will handle OS specific operations.
 
 ```js
@@ -263,23 +262,37 @@ KiteConnector.runKiteAndWait()
 
 #### .isKiteEnterpriseInstalled()
 
-A version of [isKiteInstalled](#-iskiteinstalled) that works with the enterprise version of Kite.
+A version of [`isKiteInstalled`](#iskiteinstalled) that works with the enterprise version of Kite.
 
 #### .isKiteEnterpriseRunning()
 
-A version of [isKiteRunning](#-iskiterunning) that works with the enterprise version of Kite.
+A version of [`isKiteRunning`](#iskiterunning) that works with the enterprise version of Kite.
 
 #### .canRunKiteEnterprise()
 
-A version of [canRunKite](#-canrunkite) that works with the enterprise version of Kite.
+A version of [`canRunKite`](#canrunkite) that works with the enterprise version of Kite.
 
 #### .runKiteEnterprise()
 
-A version of [runKite](#-runkite) that works with the enterprise version of Kite.
+A version of [`runKite`](#runkite) that works with the enterprise version of Kite.
 
 #### .runKiteEnterpriseAndWait()
 
-A version of [runKiteAndWait](#-runkiteandwait) that works with the enterprise version of Kite.
+A version of [`runKiteAndWait`](#runkiteandwait) that works with the enterprise version of Kite.
+
+##### .hasBothKiteInstalled()
+
+Returns a promise that resolves when both [`isKiteInstalled`](#iskiteinstalled) and [`isKiteEnterpriseInstalled`](#iskiteenterpriseinstalled) resolves.
+
+```js
+KiteConnector.hasBothKiteInstalled()
+.then(() => {
+  // both versions are installed
+})
+.catch(() => {
+  // either only one of them, or none, is installed
+})
+```
 
 #### .isKiteReachable()
 
@@ -297,7 +310,7 @@ KiteConnector.isKiteReachable()
 
 #### .waitForKite(attempts, interval)
 
-A function that performs a given number of `attempts` to reach Kite. Each attempt is realized after the specified `interval` in milliseconds. As [isKiteReachable](#-iskitereachable), the function returns a promise that will resolve when kite have successfully responded to a request, otherwise the promise will be rejected if no responses have been received after all `attempts` have been made.
+A function that performs a given number of `attempts` to reach Kite. Each attempt is realized after the specified `interval` in milliseconds. As [`isKiteReachable`](#iskitereachable), the function returns a promise that will resolve when kite have successfully responded to a request, otherwise the promise will be rejected if no responses have been received after all `attempts` have been made.
 
 ```js
 // Makes up to 10 attempts every 1.5s
@@ -347,6 +360,34 @@ The previous names are still available as well:
 |RUNNING|`3`|
 |REACHABLE|`4`|
 |AUTHENTICATED|`5`|
+
+#### Adapter delegates
+
+These methods are just delegates to the underlying adapter object.
+
+##### .hasManyKiteInstallation()
+
+Returns `true` if several versions of Kite are currently installed on the system, otherwise it returns `false` if only one version of Kite can be found. Note that this method is different of [`hasBothKiteInstalled`](#hasbothkiteinstalled) as it does not check the enterprise version but only the vanilla one.
+
+##### .hasManyKiteEnterpriseInstallation()
+
+Returns `true` if several versions of Kite enterprise are currently installed on the system, otherwise it returns `false` if only one version of Kite can be found. Note that this method is different of [`hasBothKiteInstalled`](#hasbothkiteinstalled) as it does not check the vanilla version but only the enterprise one.
+
+##### .isAdmin()
+
+Returns `true` if the current user has administrator rights on that device.
+
+##### .arch()
+
+Returns the architecture of the current device as a string (`'32bit'` or `'64bit'`).
+
+##### .isOSSupported()
+
+Returns whether the current os is supported or not. Generally, for an adapter such as windows and osx, this function returns `true`, but if no suitable adapter have been found, the `no-support` adapter will then return false.
+
+##### .isOSVersionSupported()
+
+Returns whether the current os version is supported or not. One os can be supported but that specific version isn't (such as OSX < 14).
 
 ### Test Helpers
 
