@@ -9,7 +9,7 @@
 This is the main object exposed by the module, you can get a reference by requiring the module:
 
 ```js
-const KiteConnector = require('kite-connect-js');
+const KiteConnector = require('kite-connect');
 ```
 
 No other configuration is required, the object will automatically select the proper adapter for the current OS. If the module is running on a non-supported environment, a specific adapter will be used whose methods only returns rejected promises.
@@ -202,7 +202,7 @@ KiteConnector.installKite(options)
 
 #### .isKiteRunning()
 
-Returns a promise that resovle if Kite is currently running. The operation is delegated to the underlying adapter object which will handle OS specific operations.
+Returns a promise that resolve if Kite is currently running. The operation is delegated to the underlying adapter object which will handle OS specific operations.
 
 ```js
 KiteConnector.isKiteRunning()
@@ -213,21 +213,117 @@ KiteConnector.isKiteRunning()
   // Kite is not running
 })
 ```
+
 #### .canRunKite()
 
+Returns a promise that resolve when Kite is not running and can be started. The operation is delegated to the underlying adapter object which will handle OS specific operations.
+
+```js
+KiteConnector.canRunKite()
+.then(() => {
+  // can call runKite
+})
+.catch(() => {
+  // Kite is either running or not installed
+})
+```
+
 #### .runKite()
+
+Starts an already installed Kite and returns a promise that will resolve if Kite have been successfully started. The operation is delegated to the underlying adapter object which will handle OS specific operations.
+
+```js
+KiteConnector.runKite()
+.then(() => {
+  // Kite is running but not necessarily reachable
+})
+.catch(() => {
+  // Kite couldn't be started
+})
+```
+
 #### .runKiteAndWait()
 
+
+Starts an already installed Kite, waits until its server can be reached and returns a promise that will resolve if Kite have been successfully started and reached. The start operation is delegated to the underlying adapter object which will handle OS specific operations.
+
+```js
+KiteConnector.runKiteAndWait()
+.then(() => {
+  // Kite is running and reachable
+})
+.catch(() => {
+  // Kite couldn't be started or can't be reached
+})
+```
+
 #### .isKiteEnterpriseInstalled()
+
+A version of [isKiteInstalled](#-iskiteinstalled) that works with the enterprise version of Kite.
+
 #### .isKiteEnterpriseRunning()
+
+A version of [isKiteRunning](#-iskiterunning) that works with the enterprise version of Kite.
+
 #### .canRunKiteEnterprise()
+
+A version of [canRunKite](#-canrunkite) that works with the enterprise version of Kite.
+
 #### .runKiteEnterprise()
+
+A version of [runKite](#-runkite) that works with the enterprise version of Kite.
+
 #### .runKiteEnterpriseAndWait()
 
+A version of [runKiteAndWait](#-runkiteandwait) that works with the enterprise version of Kite.
+
 #### .isKiteReachable()
-#### .waitForKite()
+
+Calls a specific endpoint to test whether Kite's local server is responding. The function returns a promise that will resolve if the server responded (with any status) and will be rejected if the request failed.
+
+```js
+KiteConnector.isKiteReachable()
+.then(() => {
+  // any request can be made to Kite
+})
+.catch(() => {
+  // Kite is not reachable
+})
+```
+
+#### .waitForKite(attempts, interval)
+
+A function that performs a given number of `attempts` to reach Kite. Each attempt is realized after the specified `interval` in milliseconds. As [isKiteReachable](#-iskitereachable), the function returns a promise that will resolve when kite have successfully responded to a request, otherwise the promise will be rejected if no responses have been received after all `attempts` have been made.
+
+```js
+// Makes up to 10 attempts every 1.5s
+KiteConnector.waitForKite(10, 1500)
+.then(() => {
+  // Kite has responded, any request can be made to Kite
+})
+.catch(() => {
+  // Kite is not reachable
+})
+```
 
 #### .isUserAuthenticated()
+
+Returns a promise that resolves if the user is logged into Kite. The promise can be rejected for several reasons, however you'll get the failure details in the error.
+
+```js
+KiteConnector.isUserAuthenticated()
+.then(() => {
+  // Current user is logged into Kite
+})
+.catch(err => {
+  if(err.type === 'bad_state' && err.data === STATES.UNLOGGED) {
+    // we received a 401, user is not logged
+  } else {
+    // the request failed for another reason
+  }
+})
+```
+
 #### .STATES
 
 |Name|Value|
@@ -257,7 +353,7 @@ This module also provides some test helpers that can be used to ease the process
 You can use the `withKite` helper to create a test suite for a specific state of Kite.
 
 ```js
-const {withKite} = require('kite-connect-js/test/helpers/kite');
+const {withKite} = require('kite-connect/test/helpers/kite');
 
 describe('some test suite', () => {
   withKite({logged: true}, () => {
@@ -294,8 +390,8 @@ routes and responses that the test server will respond to requests.
 Depending on whether you provided a `block` or not, the routes will apply to all the tests at the same level as your call or only to those created inside the provided function.
 
 ```js
-const {withKite, withKiteRoutes} = require('kite-connect-js/test/helpers/kite');
-const {fakeResponse} = require('kite-connect-js/test/helpers/http');
+const {withKite, withKiteRoutes} = require('kite-connect/test/helpers/kite');
+const {fakeResponse} = require('kite-connect/test/helpers/http');
 
 withKite({...}, () => {
   // All the tests at this level will have access to these routes.
@@ -315,8 +411,8 @@ withKite({...}, () => {
 ```
 
 ```js
-const {withKite, withKiteRoutes} = require('kite-connect-js/test/helpers/kite');
-const {fakeResponse} = require('kite-connect-js/test/helpers/http');
+const {withKite, withKiteRoutes} = require('kite-connect/test/helpers/kite');
+const {fakeResponse} = require('kite-connect/test/helpers/http');
 
 withKite({...}, () => {
   // As a function has been passed to the helper as second argument,
