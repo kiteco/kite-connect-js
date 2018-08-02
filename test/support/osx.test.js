@@ -331,8 +331,8 @@ describe('OSXAdapter', () => {
     });
 
     withKiteRunning(PLATFORM, () => {
-      it('returns a rejected function', () => {
-        return waitsForPromise({shouldReject: true}, () => OSXAdapter.runKite());
+      it('returns a resolved function', () => {
+        return waitsForPromise(() => OSXAdapter.runKite());
       });
     });
 

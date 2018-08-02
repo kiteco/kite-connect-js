@@ -205,7 +205,7 @@ describe('WindowsAdapter', () => {
     });
 
     withKiteRunning(PLATFORM, () => {
-      it('returns a resolved function', () => {
+      it('returns a resolved promise', () => {
         return waitsForPromise(() => WindowsAdapter.runKite());
       });
     });
