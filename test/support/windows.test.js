@@ -220,4 +220,34 @@ describe('WindowsAdapter', () => {
       });
     });
   });
+
+  describe('.isAdmin()', () => {
+    describe('when the user is an admin', () => {
+      beforeEach(() => {
+        fakeCommands({
+          exec: {
+            'net session': (ps) => 0,
+          },
+        });
+      });
+
+      it('returns true', () => {
+        expect(WindowsAdapter.isAdmin()).to.be.ok();
+      });
+    });
+
+    describe('when the user is not an admin', () => {
+      beforeEach(() => {
+        fakeCommands({
+          exec: {
+            'net session': (ps) => 1,
+          },
+        });
+      });
+
+      it('returns false', () => {
+        expect(WindowsAdapter.isAdmin()).not.to.be.ok();
+      });
+    });
+  });
 });
