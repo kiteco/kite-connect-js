@@ -1,6 +1,6 @@
 {
   "name": "kite-connector",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "API methods to access Kite",
   "main": "lib/index.js",
   "repository": {
