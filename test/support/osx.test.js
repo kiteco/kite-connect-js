@@ -411,4 +411,48 @@ describe('OSXAdapter', () => {
       });
     });
   });
+
+  describe('.isAdmin()', () => {
+    describe('when the user is an admin', () => {
+      beforeEach(() => {
+        fakeCommands({
+          exec: {
+            whoami: (ps) => {
+              ps.stdout('username');
+              return 0;
+            },
+            'dscacheutil -q group -a name admin': (ps) => {
+              ps.stdout('users: username');
+              return 0;
+            },
+          },
+        });
+      });
+
+      it('returns true', () => {
+        expect(OSXAdapter.isAdmin()).to.be.ok();
+      });
+    });
+
+    describe('when the user is not an admin', () => {
+      beforeEach(() => {
+        fakeCommands({
+          exec: {
+            whoami: (ps) => {
+              ps.stdout('username');
+              return 0;
+            },
+            'dscacheutil -q group -a name admin': (ps) => {
+              ps.stdout('users: foo bar baz');
+              return 0;
+            },
+          },
+        });
+      });
+
+      it('returns false', () => {
+        expect(OSXAdapter.isAdmin()).not.to.be.ok();
+      });
+    });
+  });
 });

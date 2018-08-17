@@ -95,6 +95,22 @@ function fakeCommands(commands) {
       ? callback(null, stdout)
       : callback({}, stdout, stderr);
     }));
+
+    stubs.push(sinon.stub(proc, 'execSync').callsFake((process, options, callback) => {
+      const mock = _commands.exec[process];
+
+      let stdout, stderr;
+
+      const status = mock ? mock({
+        stdout(data) { stdout = data; },
+        stderr(data) { stderr = data; },
+      }, options) : 1;
+
+      if (status !== 0) {
+        throw new Error(stderr);
+      }
+      return stdout;
+    }));
   }
 
   return restorer;
