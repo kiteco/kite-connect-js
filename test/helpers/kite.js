@@ -3,6 +3,7 @@
 const KiteConnector = require('../../lib');
 const testAdapter = require('../../lib/support/test-adapter');
 const TestClient = require('../../lib/clients/test-client');
+const KiteStateError = require('../../lib/kite-state-error');
 const {fakeResponse} = require('./http');
 
 function join(arr) {
@@ -79,7 +80,11 @@ function withKite(setup, block) {
       if (!setup.reachable) {
         KiteConnector.client.addRoute([
           o => true,
-          o => { throw new Error(); },
+          o => {
+            throw new KiteStateError('Kite is not reachable', {
+              state: KiteConnector.STATES.UNREACHABLE,
+            }); 
+          },
         ]);
       } else {
         KiteConnector.client.addRoute([

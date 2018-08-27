@@ -169,7 +169,7 @@ describe('KiteConnector', () => {
       it('returns a rejected promise with the UNSUPPORTED state', () => {
         return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
         .then(err => {
-          expect(err.data).to.eql(KiteConnector.STATES.UNSUPPORTED);
+          expect(err.data.state).to.eql(KiteConnector.STATES.UNSUPPORTED);
         });
       });
 
@@ -193,7 +193,7 @@ describe('KiteConnector', () => {
           return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
           .then(() => {
             expect(failSpy.called).to.be.ok();
-            expect(failSpy.lastCall.args[0].data).to.eql(KiteConnector.STATES.UNSUPPORTED);
+            expect(failSpy.lastCall.args[0].data.state).to.eql(KiteConnector.STATES.UNSUPPORTED);
           });
         });
       });
@@ -203,7 +203,7 @@ describe('KiteConnector', () => {
       it('returns a rejected promise with the UNINSTALLED state', () => {
         return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
         .then(err => {
-          expect(err.data).to.eql(KiteConnector.STATES.UNINSTALLED);
+          expect(err.data.state).to.eql(KiteConnector.STATES.UNINSTALLED);
         });
       });
     });
@@ -212,7 +212,7 @@ describe('KiteConnector', () => {
       it('returns a rejected promise with the NOT_RUNNING state', () => {
         return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
         .then(err => {
-          expect(err.data).to.eql(KiteConnector.STATES.NOT_RUNNING);
+          expect(err.data.state).to.eql(KiteConnector.STATES.NOT_RUNNING);
         });
       });
     });
@@ -221,7 +221,7 @@ describe('KiteConnector', () => {
       it('returns a rejected promise with the UNREACHABLE state', () => {
         return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
         .then(err => {
-          expect(err.data).to.eql(KiteConnector.STATES.UNREACHABLE);
+          expect(err.data.state).to.eql(KiteConnector.STATES.UNREACHABLE);
         });
       });
     });
@@ -234,7 +234,7 @@ describe('KiteConnector', () => {
       it('returns a rejected promise with the UNLOGGED state', () => {
         return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
         .then(err => {
-          expect(err.data).to.eql(KiteConnector.STATES.UNLOGGED);
+          expect(err.data.state).to.eql(KiteConnector.STATES.UNLOGGED);
         });
       });
     });
@@ -248,7 +248,7 @@ describe('KiteConnector', () => {
       it('returns a rejected promise with the NOT_WHITELISTED state', () => {
         return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
         .then(err => {
-          expect(err.data).to.eql(KiteConnector.STATES.NOT_WHITELISTED);
+          expect(err.data.state).to.eql(KiteConnector.STATES.NOT_WHITELISTED);
         });
       });
     });
@@ -263,8 +263,8 @@ describe('KiteConnector', () => {
         return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
         .then(err => {
           expect(err.type).to.eql('bad_status');
-          expect(err.data).to.eql(404);
-          expect(err.content).to.eql('not found');
+          expect(err.data.responseStatus).to.eql(404);
+          expect(err.data.responseData).to.eql('not found');
         });
       });
     });

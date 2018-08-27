@@ -121,7 +121,7 @@ describe('withKite', () => {
     it('is not logged', () => {
       return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated())
       .then(err => {
-        expect(err.data).to.eql(KiteConnector.STATES.UNREACHABLE);
+        expect(err.data.state).to.eql(KiteConnector.STATES.UNREACHABLE);
       });
     });
   });
@@ -148,7 +148,7 @@ describe('withKite', () => {
     it('is not logged', () => {
       return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated())
       .then(err => {
-        expect(err.data).to.eql(KiteConnector.STATES.UNREACHABLE);
+        expect(err.data.state).to.eql(KiteConnector.STATES.UNREACHABLE);
       });
     });
   });
@@ -169,7 +169,7 @@ describe('withKite', () => {
     it('is not logged', () => {
       return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated())
       .then(err => {
-        expect(err.data).to.eql(KiteConnector.STATES.UNLOGGED);
+        expect(err.data.state).to.eql(KiteConnector.STATES.UNLOGGED);
       });
     });
   });
