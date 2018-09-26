@@ -104,6 +104,8 @@ function fakeRequestMethod(resp) {
         }
       },
       write(data) {},
+      emit: sinon.spy(),
+      removeListener() {},
       setTimeout(timeout, callback) {
         if (resp == null) { callback({}); }
       },

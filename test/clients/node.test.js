@@ -151,5 +151,51 @@ describe('NodeClient', () => {
         });
       });
     });
+
+    describe('when the request has a multipart/form-data content type', () => {
+      beforeEach(() => {
+        requestStub = sinon.stub(http, 'request').callsFake(fakeRequestMethod(true));
+      });
+
+      afterEach(() => {
+        requestStub.restore();
+      });
+
+      it('builds the proper headers for Content-Type', () => {
+        promise = client.request({
+          path: '/foo',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }, {
+          data1: 'foo',
+          data2: 'bar',
+        });
+        return promise.then((resp) => {
+          expect(/multipart\/form-data; boundary=/
+                .test(http.request.lastCall.args[0].headers['content-type'])
+              ).to.be.ok();
+          expect(resp.request.emit.called).to.be.ok();
+        });
+      });
+
+      it('builds the proper headers for content-type', () => {
+        promise = client.request({
+          path: '/foo',
+          headers: {
+            'content-type': 'multipart/form-data',
+          },
+        }, {
+          data1: 'foo',
+          data2: 'bar',
+        });
+        return promise.then((resp) => {
+          expect(/multipart\/form-data; boundary=/
+                .test(http.request.lastCall.args[0].headers['content-type'])
+              ).to.be.ok();
+          expect(resp.request.emit.called).to.be.ok();
+        });
+      });
+    });
   });
 });
