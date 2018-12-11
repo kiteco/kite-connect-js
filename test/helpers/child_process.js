@@ -54,6 +54,9 @@ function fakeCommands(commands) {
   } else {
     stubs.push(sinon.stub(proc, 'spawn').callsFake((process, options) => {
       const mock = _commands[process];
+      if (!mock) {
+        throw new Error('ENOENT');
+      }
       const ps = {
         stdout: fakeStdStream(),
         stderr: fakeStdStream(),
