@@ -31,10 +31,6 @@ function fakeKiteInstallPaths(platform) {
             ps.stdout('');
             return 0;
           },
-          'C:\\Windows\\Kite.exe': (ps) => {
-            ps.stdout('');
-            return 1;
-          },
         });
         if (!WindowsSupport) {
           WindowsSupport = require('../../lib/support/windows');
