@@ -1,6 +1,6 @@
 'use strict';
 
-let WindowsSupport;
+let WindowsSupport, OSXSupport;
 
 const os = require('os');
 const {fakeCommands} = require('./child_process');
@@ -24,6 +24,11 @@ function fakeKiteInstallPaths(platform) {
             return 0;
           },
         });
+        if (!OSXSupport) {
+          OSXSupport = require('../../lib/support/osx');
+        }
+        safePaths = OSXSupport.KITE_APP_PATH.defaultInstalled;
+        OSXSupport.KITE_APP_PATH.defaultInstalled = '/path/to/app';
         break;
       case 'win32':
         commandsRestore = fakeCommands({
@@ -44,6 +49,9 @@ function fakeKiteInstallPaths(platform) {
   afterEach(() => {
     commandsRestore && commandsRestore.restore();
     switch (platform) {
+      case 'darwin':
+        OSXSupport.KITE_APP_PATH.defaultInstalled = safePaths;
+        break;
       case 'win32':
         WindowsSupport.KITE_EXE_PATH = safePaths;
         break;
@@ -68,6 +76,7 @@ function withKiteInstalled(platform, block) {
               return 0;
             },
           });
+          OSXSupport.KITE_APP_PATH.defaultInstalled = __filename;
           break;
         case 'win32':
           commandsRestore = fakeCommands({
