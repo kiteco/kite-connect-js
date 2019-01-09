@@ -29,7 +29,6 @@ function setupDescription(setup) {
 
   // Special cases for when a state is true, we're shortening the description
   // with only that state
-  if (setup.logged) { return finalize('logged'); }
   if (setup.reachable) { return finalize('reachable'); }
   if (running) { return finalize('running'); }
   if (installed) { return finalize('installed'); }
@@ -51,7 +50,6 @@ function setupDescription(setup) {
 function withKite(setup, block) {
   // We want to make setup as simple as possible, by only setting
   // running we're also saying "kite is installed on a supported platform"
-  if (setup.logged != undefined && setup.reachable == undefined) { setup.reachable = true; }
   if (setup.reachable != undefined && setup.running == undefined) { setup.running = true; }
   if (setup.running != undefined && setup.installed == undefined) { setup.installed = true; }
   if (setup.runningEnterprise != undefined && setup.installedEnterprise == undefined) {
@@ -66,7 +64,6 @@ function withKite(setup, block) {
   if (!setup.installed) { setup.running = false; }
   if (!setup.installedEnterprise) { setup.runningEnterprise = false; }
   if (!(setup.running || setup.runningEnterprise)) { setup.reachable = false; }
-  if (!setup.reachable) { setup.logged = false; }
 
   describe(setupDescription(setup), () => {
     let safeAdapter, safeClient;
@@ -83,13 +80,13 @@ function withKite(setup, block) {
           o => {
             throw new KiteStateError('Kite is not reachable', {
               state: KiteConnector.STATES.UNREACHABLE,
-            }); 
+            });
           },
         ]);
       } else {
         KiteConnector.client.addRoute([
           o => o.path === '/clientapi/user',
-          o => setup.logged ? fakeResponse(200) : fakeResponse(401),
+          o => fakeResponse(200),
         ]);
       }
     });

@@ -1,6 +1,5 @@
 'use strict';
 
-const expect = require('expect.js');
 const KiteConnector = require('../lib');
 const {withKite} = require('./helpers/kite');
 const {waitsForPromise} = require('./helpers/async');
@@ -126,21 +125,6 @@ describe('withKite', () => {
   });
 
   withKite({reachable: true}, () => {
-    it('is supported', () => {
-      return waitsForPromise(() => KiteConnector.isKiteSupported());
-    });
-    it('is installed', () => {
-      return waitsForPromise(() => KiteConnector.isKiteInstalled());
-    });
-    it('is running', () => {
-      return waitsForPromise(() => KiteConnector.isKiteRunning());
-    });
-    it('is reachable', () => {
-      return waitsForPromise(() => KiteConnector.isKiteReachable());
-    });
-  });
-
-  withKite({logged: true}, () => {
     it('is supported', () => {
       return waitsForPromise(() => KiteConnector.isKiteSupported());
     });
