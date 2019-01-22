@@ -1,6 +1,5 @@
 'use strict';
 
-const expect = require('expect.js');
 const KiteConnector = require('../lib');
 const {withKite} = require('./helpers/kite');
 const {waitsForPromise} = require('./helpers/async');
@@ -19,9 +18,6 @@ describe('withKite', () => {
     it('is not reachable', () => {
       return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteReachable());
     });
-    it('is not logged', () => {
-      return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated());
-    });
   });
 
   withKite({
@@ -29,7 +25,6 @@ describe('withKite', () => {
     installed: true,
     running: true,
     reachable: true,
-    logged: true,
   }, () => {
     it('is not supported', () => {
       return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteSupported());
@@ -42,9 +37,6 @@ describe('withKite', () => {
     });
     it('is not reachable', () => {
       return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteReachable());
-    });
-    it('is not logged', () => {
-      return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated());
     });
   });
 
@@ -61,9 +53,6 @@ describe('withKite', () => {
     it('is not reachable', () => {
       return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteReachable());
     });
-    it('is not logged', () => {
-      return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated());
-    });
   });
 
   withKite({installed: true}, () => {
@@ -78,9 +67,6 @@ describe('withKite', () => {
     });
     it('is not reachable', () => {
       return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteReachable());
-    });
-    it('is not logged', () => {
-      return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated());
     });
   });
 
@@ -100,9 +86,6 @@ describe('withKite', () => {
     it('is not reachable', () => {
       return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteReachable());
     });
-    it('is not logged', () => {
-      return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated());
-    });
   });
 
   withKite({running: true}, () => {
@@ -117,12 +100,6 @@ describe('withKite', () => {
     });
     it('is not reachable', () => {
       return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteReachable());
-    });
-    it('is not logged', () => {
-      return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated())
-      .then(err => {
-        expect(err.data.state).to.eql(KiteConnector.STATES.UNREACHABLE);
-      });
     });
   });
 
@@ -145,12 +122,6 @@ describe('withKite', () => {
     it('is not reachable', () => {
       return waitsForPromise({shouldReject: true}, () => KiteConnector.isKiteReachable());
     });
-    it('is not logged', () => {
-      return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated())
-      .then(err => {
-        expect(err.data.state).to.eql(KiteConnector.STATES.UNREACHABLE);
-      });
-    });
   });
 
   withKite({reachable: true}, () => {
@@ -165,30 +136,6 @@ describe('withKite', () => {
     });
     it('is reachable', () => {
       return waitsForPromise(() => KiteConnector.isKiteReachable());
-    });
-    it('is not logged', () => {
-      return waitsForPromise({shouldReject: true}, () => KiteConnector.isUserAuthenticated())
-      .then(err => {
-        expect(err.data.state).to.eql(KiteConnector.STATES.UNLOGGED);
-      });
-    });
-  });
-
-  withKite({logged: true}, () => {
-    it('is supported', () => {
-      return waitsForPromise(() => KiteConnector.isKiteSupported());
-    });
-    it('is installed', () => {
-      return waitsForPromise(() => KiteConnector.isKiteInstalled());
-    });
-    it('is running', () => {
-      return waitsForPromise(() => KiteConnector.isKiteRunning());
-    });
-    it('is reachable', () => {
-      return waitsForPromise(() => KiteConnector.isKiteReachable());
-    });
-    it('is logged', () => {
-      return waitsForPromise(() => KiteConnector.isUserAuthenticated());
     });
   });
 });

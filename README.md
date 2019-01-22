@@ -401,8 +401,8 @@ You can use the `withKite` helper to create a test suite for a specific state of
 const {withKite} = require('kite-connect/test/helpers/kite');
 
 describe('some test suite', () => {
-  withKite({logged: true}, () => {
-    // tests in logged state
+  withKite({reachable: true}, () => {
+    // tests in reachable state
   })
 });
 ```
