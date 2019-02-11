@@ -346,8 +346,8 @@ describe('OSXAdapter', () => {
           ])).to.be.ok();
 
           expect(proc.spawn.calledWith('open', [
-            '-a', OSXAdapter.installPath, '--args', '"--plugin-launch"', customEnv(process.env, null, ['ELECTRON_RUN_AS_NODE']),
-          ])).to.be.ok();
+            '-a', OSXAdapter.installPath, '--args', '"--plugin-launch"',
+          ], customEnv(process.env, null, ['ELECTRON_RUN_AS_NODE']))).to.be.ok();
         });
       });
     });
@@ -406,8 +406,8 @@ describe('OSXAdapter', () => {
           ])).to.be.ok();
 
           expect(proc.spawn.calledWith('open', [
-            '-a', OSXAdapter.enterpriseInstallPath, customEnv(process.env, null, ['ELECTRON_RUN_AS_NODE']),
-          ])).to.be.ok();
+            '-a', OSXAdapter.enterpriseInstallPath,
+          ], customEnv(process.env, null, ['ELECTRON_RUN_AS_NODE']))).to.be.ok();
         });
       });
     });
