@@ -15,6 +15,7 @@ const {
   withKiteEnterpriseInstalled, withBothKiteInstalled,
   withKiteEnterpriseRunning, withKiteEnterpriseNotRunning,
 } = require('../helpers/system');
+const { customEnv } = require('../helpers/utils')
 
 const PLATFORM = 'darwin';
 
@@ -346,7 +347,7 @@ describe('OSXAdapter', () => {
 
           expect(proc.spawn.calledWith('open', [
             '-a', OSXAdapter.installPath, '--args', '"--plugin-launch"',
-          ])).to.be.ok();
+          ], customEnv(process.env, null, ['ELECTRON_RUN_AS_NODE']))).to.be.ok();
         });
       });
     });
@@ -406,7 +407,7 @@ describe('OSXAdapter', () => {
 
           expect(proc.spawn.calledWith('open', [
             '-a', OSXAdapter.enterpriseInstallPath,
-          ])).to.be.ok();
+          ], customEnv(process.env, null, ['ELECTRON_RUN_AS_NODE']))).to.be.ok();
         });
       });
     });
