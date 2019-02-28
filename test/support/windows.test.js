@@ -51,7 +51,7 @@ describe('WindowsAdapter', () => {
           unlinkSpy = sinon.stub(fs, 'unlinkSync');
           fakeCommands({
             exec: {
-              [WindowsAdapter.KITE_INSTALLER_PATH + ' --skip-onboarding --plugin-launch']: () => 0,
+              [`"${WindowsAdapter.KITE_INSTALLER_PATH}"` + ' --skip-onboarding --plugin-launch']: () => 0,
             },
             del: () => 0,
           });
@@ -96,7 +96,7 @@ describe('WindowsAdapter', () => {
         unlinkSpy = sinon.stub(fs, 'unlinkSync');
         commandsRestore = fakeCommands({
           exec: {
-            [WindowsAdapter.KITE_INSTALLER_PATH + ' --skip-onboarding --plugin-launch']: () => 0,
+            [`"${WindowsAdapter.KITE_INSTALLER_PATH}"` + ' --skip-onboarding --plugin-launch']: () => 0,
           },
         });
       });
@@ -129,7 +129,7 @@ describe('WindowsAdapter', () => {
       beforeEach(() => {
         commandsRestore = fakeCommands({
           exec: {
-            [WindowsAdapter.KITE_INSTALLER_PATH + ' --skip-onboarding --plugin-launch']: () => 1,
+            [`"${WindowsAdapter.KITE_INSTALLER_PATH}"` + ' --skip-onboarding --plugin-launch']: () => 1,
           },
         });
       });
@@ -150,7 +150,7 @@ describe('WindowsAdapter', () => {
         });
         commandsRestore = fakeCommands({
           exec: {
-            [WindowsAdapter.KITE_INSTALLER_PATH + ' --skip-onboarding --plugin-launch']: () => 0,
+            [`"${WindowsAdapter.KITE_INSTALLER_PATH}"` + ' --skip-onboarding --plugin-launch']: () => 0,
           },
         });
       });
