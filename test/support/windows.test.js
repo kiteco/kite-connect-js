@@ -13,6 +13,7 @@ const {fakeCommands} = require('../helpers/child_process');
 const {
   fakeKiteInstallPaths, withKiteInstalled, withKiteRunning, withKiteNotRunning,
 } = require('../helpers/system');
+const { kiteDownloadRoutes } = require('../helpers/kite');
 
 const PLATFORM = 'win32';
 
@@ -36,15 +37,7 @@ describe('WindowsAdapter', () => {
   });
 
   describe('.downloadKite()', () => {
-    withFakeServer([
-      [
-        o => /^https:\/\/kite\.com/.test(o),
-        o => fakeResponse(303, '', {headers: {location: 'https://download.kite.com'}}),
-      ], [
-        o => /^https:\/\/download\.kite\.com/.test(o),
-        o => fakeResponse(200, 'foo'),
-      ],
-    ], () => {
+    withFakeServer(kiteDownloadRoutes, () => {
       describe('when the download succeeds', () => {
         let unlinkSpy;
         beforeEach(() => {
@@ -64,7 +57,7 @@ describe('WindowsAdapter', () => {
         describe('with the install option', () => {
           it('returns a promise resolved after the install', () => {
             const options = {
-              installed: true,
+              install: true,
               onDownload: sinon.spy(),
               onInstallStart: sinon.spy(),
               onCopy: sinon.spy(),
@@ -199,7 +192,7 @@ describe('WindowsAdapter', () => {
 
   describe('.runKite()', () => {
     describe('when kite is not installed', () => {
-      it('returns a rejected function', () => {
+      it('returns a rejected promise', () => {
         return waitsForPromise({shouldReject: true}, () => WindowsAdapter.runKite());
       });
     });
