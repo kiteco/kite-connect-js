@@ -119,10 +119,9 @@ describe('LinuxAdapter', () => {
   describe('.downloadKite()', () => {
     withFakeServer(kiteDownloadRoutes, () => {
       describe('when the download succeeds', () => {
-        let unlinkSpy, isKiteInitiallyInstalledSpy;
+        let unlinkSpy;
         beforeEach(() => {
           unlinkSpy = sinon.stub(fs, 'unlinkSync');
-          isKiteInitiallyInstalledSpy = sinon.stub(LinuxAdapter, 'isKiteInitiallyInstalled').resolves();
 
           fakeCommands({
             apt: () => 0,
@@ -131,7 +130,6 @@ describe('LinuxAdapter', () => {
 
         afterEach(() => {
           unlinkSpy.restore();
-          isKiteInitiallyInstalledSpy.restore();
         });
 
         describe('with the install option', () => {
@@ -162,47 +160,11 @@ describe('LinuxAdapter', () => {
     });
   });
 
-  describe('.isKiteInitiallyInstalled()', () => {
-    let existsSpy, readlinkSpy;
-    describe('when kite is initially installed', () => {
-      beforeEach(() => {
-        existsSpy = sinon.stub(fs, 'exists').callArgWith(1, true);
-        readlinkSpy = sinon.stub(fs, 'readlink').callArgWith(1, null, 'kite-v1');
-      });
-
-      afterEach(() => {
-        existsSpy.restore();
-        readlinkSpy.restore();
-      });
-      
-      it('returns a resolved promise', () => {
-        return waitsForPromise(() => LinuxAdapter.isKiteInitiallyInstalled());
-      });
-    });
-
-    describe('when kite is not initially installed', () => {
-      beforeEach(() => {
-        existsSpy = sinon.stub(fs, 'exists').callArgWith(1, true);
-      });
-
-      afterEach(() => {
-        existsSpy.restore();
-      });
-      
-      it('returns a rejected promise', () => {
-        return waitsForPromise({
-          shouldReject: true,
-        }, () => LinuxAdapter.isKiteInitiallyInstalled());
-      });
-    });
-  });
-
   describe('.installKite()', () => {
-    let unlinkSpy, isKiteInitiallyInstalledSpy;
+    let unlinkSpy;
     describe('when the total installation succeeds', () => {
       beforeEach(() => {
         unlinkSpy = sinon.stub(fs, 'unlinkSync');
-        isKiteInitiallyInstalledSpy = sinon.stub(LinuxAdapter, 'isKiteInitiallyInstalled').resolves();
         fakeCommands({
           apt: () => 0,
         });
@@ -210,7 +172,6 @@ describe('LinuxAdapter', () => {
 
       afterEach(() => {
         unlinkSpy.restore();
-        isKiteInitiallyInstalledSpy.restore();
       });
 
       it('returns a resolved promise', () => {
@@ -269,7 +230,6 @@ describe('LinuxAdapter', () => {
     describe('when kited does not get updated properly', () => {
       beforeEach(() => {
         unlinkSpy = sinon.stub(fs, 'unlinkSync');
-        isKiteInitiallyInstalledSpy = sinon.stub(LinuxAdapter, 'isKiteInitiallyInstalled').rejects('kited not there');
         fakeCommands({
           apt: () => 0,
         });
@@ -277,7 +237,6 @@ describe('LinuxAdapter', () => {
 
       afterEach(() => {
         unlinkSpy.restore();
-        isKiteInitiallyInstalledSpy.restore();
       });
       
       it('returns a rejected promise', () => {
