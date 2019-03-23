@@ -226,40 +226,6 @@ describe('LinuxAdapter', () => {
         }, () => LinuxAdapter.installKite());
       });
     });
-
-    describe('when kited does not get updated properly', () => {
-      beforeEach(() => {
-        unlinkSpy = sinon.stub(fs, 'unlinkSync');
-        fakeCommands({
-          apt: () => 0,
-        });
-      });
-
-      afterEach(() => {
-        unlinkSpy.restore();
-      });
-      
-      it('returns a rejected promise', () => {
-        const options = {
-          onInstallStart: sinon.stub(),
-          onMount: sinon.stub(),
-          onRemove: sinon.stub(),
-        };
-        return waitsForPromise({
-          shouldReject: true,
-        }, () => LinuxAdapter.installKite(options))
-        .then(() => {
-          expect(proc.spawn.calledWith('apt', [
-            'install', '-f', LinuxAdapter.KITE_DEB_PATH,
-          ])).to.be.ok();
-          expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_DEB_PATH)).to.be.ok();
-
-          expect(options.onInstallStart.called).to.be.ok();
-          expect(options.onMount.called).to.be.ok();
-          expect(options.onRemove.called).to.be.ok();
-        });
-      });
-    });
   });
 
   describe('.isKiteRunning()', () => {
@@ -267,7 +233,7 @@ describe('LinuxAdapter', () => {
       it('returns a rejected promise', () => {
         return waitsForPromise({
           shouldReject: true,
-        }, () => LinuxAdapter.installKite());
+        }, () => LinuxAdapter.isKiteRunning());
       });
     });
 
@@ -298,19 +264,44 @@ describe('LinuxAdapter', () => {
   });
 
   describe('.runKite()', () => {
+    let existSpy;
     describe('when kite is not installed', () => {
+      beforeEach(() => {
+        existSpy = sinon.stub(fs, 'existsSync').returns(false);
+      });
+
+      afterEach(() => {
+        existSpy.restore();
+      });
+
       it('returns a rejected promise', () => {
         return waitsForPromise({shouldReject: true}, () => LinuxAdapter.runKite());
       });
     });
 
     withKiteRunning(PLATFORM, () => {
+      beforeEach(() => {
+        existSpy = sinon.stub(fs, 'existsSync').returns(true);
+      });
+
+      afterEach(() => {
+        existSpy.restore();
+      });
+
       it('returns a resolved promise', () => {
         return waitsForPromise(() => LinuxAdapter.runKite());
       });
     });
 
     withKiteNotRunning(PLATFORM, () => {
+      beforeEach(() => {
+        existSpy = sinon.stub(fs, 'existsSync').returns(true);
+      });
+
+      afterEach(() => {
+        existSpy.restore();
+      });
+
       it('returns a resolved promise', () => {
         return waitsForPromise(() => LinuxAdapter.runKite())
           .then(() => {
