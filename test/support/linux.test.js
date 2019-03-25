@@ -19,11 +19,12 @@ const { kiteDownloadRoutes } = require('../helpers/kite');
 const PLATFORM = 'linux';
 
 describe('LinuxAdapter', () => {
-  
+  let commandsRestore;
+
   describe('.isAdmin()', () => {
     describe('when the user is an admin', () => {
       beforeEach(() => {
-        fakeCommands({
+        commandsRestore = fakeCommands({
           exec: {
             whoami: (ps) => {
               ps.stdout('username');
@@ -37,6 +38,10 @@ describe('LinuxAdapter', () => {
         });
       });
 
+      afterEach(() => {
+        commandsRestore.restore();
+      });
+
       it('returns true', () => {
         expect(LinuxAdapter.isAdmin()).to.be.ok();
       });
@@ -44,7 +49,7 @@ describe('LinuxAdapter', () => {
 
     describe('when the user is not an admin', () => {
       beforeEach(() => {
-        fakeCommands({
+        commandsRestore = fakeCommands({
           exec: {
             whoami: (ps) => {
               ps.stdout('fake');
@@ -58,6 +63,10 @@ describe('LinuxAdapter', () => {
         });
       });
 
+      afterEach(() => {
+        commandsRestore.restore();
+      });
+
       it('returns false', () => {
         expect(LinuxAdapter.isAdmin()).not.to.be.ok();
       });
@@ -67,7 +76,7 @@ describe('LinuxAdapter', () => {
   describe('.isOSVersionSupported()', () => {
     describe('when the os version is not supported', () => {
       beforeEach(() => {
-        fakeCommands({
+        commandsRestore = fakeCommands({
           exec: {
             'lsb_release -r': (ps) => {
               ps.stdout('Release:	16.04');
@@ -77,6 +86,10 @@ describe('LinuxAdapter', () => {
         });
       });
 
+      afterEach(() => {
+        commandsRestore.restore();
+      });
+
       it('returns false', () => {
         expect(LinuxAdapter.isOSVersionSupported()).not.to.be.ok();
       });
@@ -84,7 +97,7 @@ describe('LinuxAdapter', () => {
 
     describe('when the os version is supported', () => {
       beforeEach(() => {
-        fakeCommands({
+        commandsRestore = fakeCommands({
           exec: {
             'lsb_release -r': (ps) => {
               ps.stdout('Release:	18.04');
@@ -92,6 +105,10 @@ describe('LinuxAdapter', () => {
             },
           },
         });
+      });
+      
+      afterEach(() => {
+        commandsRestore.restore();
       });
 
       it('returns true', () => {
@@ -123,13 +140,14 @@ describe('LinuxAdapter', () => {
         beforeEach(() => {
           unlinkSpy = sinon.stub(fs, 'unlinkSync');
 
-          fakeCommands({
+          commandsRestore = fakeCommands({
             apt: () => 0,
           });
         });
 
         afterEach(() => {
           unlinkSpy.restore();
+          commandsRestore.restore();
         });
 
         describe('with the install option', () => {
@@ -165,13 +183,14 @@ describe('LinuxAdapter', () => {
     describe('when the total installation succeeds', () => {
       beforeEach(() => {
         unlinkSpy = sinon.stub(fs, 'unlinkSync');
-        fakeCommands({
+        commandsRestore = fakeCommands({
           apt: () => 0,
         });
       });
 
       afterEach(() => {
         unlinkSpy.restore();
+        commandsRestore.restore();
       });
 
       it('returns a resolved promise', () => {
@@ -196,9 +215,13 @@ describe('LinuxAdapter', () => {
 
     describe('when the installation fails', () => {
       beforeEach(() => {
-        fakeCommands({
+        commandsRestore = fakeCommands({
           apt: () => 1,
         });
+      });
+
+      afterEach(() => {
+        commandsRestore.restore();
       });
 
       it('returns a rejected promise', () => {
@@ -211,13 +234,14 @@ describe('LinuxAdapter', () => {
     describe('when removing the deb fails', () => {
       beforeEach(() => {
         unlinkSpy = sinon.stub(fs, 'unlinkSync').throws('unlink failed');
-        fakeCommands({
+        commandsRestore = fakeCommands({
           apt: () => 0,
         });
       });
 
       afterEach(() => {
         unlinkSpy.restore();
+        commandsRestore.restore();
       });
 
       it('returns a rejected promise', () => {
@@ -240,12 +264,16 @@ describe('LinuxAdapter', () => {
     withKiteInstalled(PLATFORM, () => {
       describe('but not running', () => {
         beforeEach(() => {
-          fakeCommands({
+          commandsRestore = fakeCommands({
             '/bin/ps': (ps) => {
               ps.stdout('');
               return 0;
             },
           });
+        });
+
+        afterEach(() => {
+          commandsRestore.restore();
         });
 
         it('returns a rejected promise', () => {
