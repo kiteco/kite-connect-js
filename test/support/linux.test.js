@@ -160,7 +160,7 @@ describe('LinuxAdapter', () => {
             };
             const url = 'https://kite.com/download';
 
-            LinuxAdapter.downloadKite(url, options)
+            return LinuxAdapter.downloadKite(url, options)
             .then(() => {
               expect(https.request.calledWith(url)).to.be.ok();
               expect(proc.spawn.calledWith('apt', 

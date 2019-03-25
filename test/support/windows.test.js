@@ -37,14 +37,15 @@ describe('WindowsAdapter', () => {
   });
 
   describe('.downloadKite()', () => {
+    let commandsRestore;
     withFakeServer(kiteDownloadRoutes, () => {
       describe('when the download succeeds', () => {
         let unlinkSpy;
         beforeEach(() => {
           unlinkSpy = sinon.stub(fs, 'unlinkSync');
-          fakeCommands({
+          commandsRestore = fakeCommands({
             exec: {
-              [`"${WindowsAdapter.KITE_INSTALLER_PATH}"` + ' --skip-onboarding --plugin-launch']: () => 0,
+              [`"${WindowsAdapter.KITE_INSTALLER_PATH}"` + ' --skip-onboarding --plugin-launch --channel=autocomplete-python']: () => 0,
             },
             del: () => 0,
           });
@@ -52,6 +53,7 @@ describe('WindowsAdapter', () => {
 
         afterEach(() => {
           unlinkSpy.restore();
+          commandsRestore.restore();
         });
 
         describe('with the install option', () => {
@@ -65,7 +67,7 @@ describe('WindowsAdapter', () => {
             };
             const url = 'https://kite.com/download';
 
-            WindowsAdapter.downloadKite(url, options)
+            return WindowsAdapter.downloadKite(url, options)
             .then(() => {
               expect(https.request.calledWith(url)).to.be.ok();
 
