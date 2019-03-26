@@ -141,7 +141,7 @@ describe('LinuxAdapter', () => {
           unlinkSpy = sinon.stub(fs, 'unlinkSync');
 
           commandsRestore = fakeCommands({
-            'apt-get': () => 0,
+            'apt': () => 0,
           });
         });
 
@@ -163,7 +163,7 @@ describe('LinuxAdapter', () => {
             return LinuxAdapter.downloadKite(url, options)
             .then(() => {
               expect(https.request.calledWith(url)).to.be.ok();
-              expect(proc.spawn.calledWith('apt-get', 
+              expect(proc.spawn.calledWith('apt', 
                 ['install', '-f', LinuxAdapter.KITE_DEB_PATH])).to.be.ok();
               
               expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_DEB_PATH)).to.be.ok();
@@ -184,7 +184,7 @@ describe('LinuxAdapter', () => {
       beforeEach(() => {
         unlinkSpy = sinon.stub(fs, 'unlinkSync');
         commandsRestore = fakeCommands({
-          'apt-get': () => 0,
+          'apt': () => 0,
         });
       });
 
@@ -201,7 +201,7 @@ describe('LinuxAdapter', () => {
         };
         return waitsForPromise(() => LinuxAdapter.installKite(options))
         .then(() => {
-          expect(proc.spawn.calledWith('apt-get', [
+          expect(proc.spawn.calledWith('apt', [
             'install', '-f', LinuxAdapter.KITE_DEB_PATH,
           ])).to.be.ok();
           expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_DEB_PATH)).to.be.ok();
@@ -216,7 +216,7 @@ describe('LinuxAdapter', () => {
     describe('when the installation fails', () => {
       beforeEach(() => {
         commandsRestore = fakeCommands({
-          'apt-get': () => 1,
+          'apt': () => 1,
         });
       });
 
@@ -235,7 +235,7 @@ describe('LinuxAdapter', () => {
       beforeEach(() => {
         unlinkSpy = sinon.stub(fs, 'unlinkSync').throws('unlink failed');
         commandsRestore = fakeCommands({
-          'apt-get': () => 0,
+          'apt': () => 0,
         });
       });
 
