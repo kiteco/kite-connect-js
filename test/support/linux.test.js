@@ -141,7 +141,7 @@ describe('LinuxAdapter', () => {
           unlinkSpy = sinon.stub(fs, 'unlinkSync');
 
           commandsRestore = fakeCommands({
-            apt: () => 0,
+            'apt-get': () => 0,
           });
         });
 
@@ -184,7 +184,7 @@ describe('LinuxAdapter', () => {
       beforeEach(() => {
         unlinkSpy = sinon.stub(fs, 'unlinkSync');
         commandsRestore = fakeCommands({
-          apt: () => 0,
+          'apt-get': () => 0,
         });
       });
 
@@ -216,7 +216,7 @@ describe('LinuxAdapter', () => {
     describe('when the installation fails', () => {
       beforeEach(() => {
         commandsRestore = fakeCommands({
-          apt: () => 1,
+          'apt-get': () => 1,
         });
       });
 
@@ -235,7 +235,7 @@ describe('LinuxAdapter', () => {
       beforeEach(() => {
         unlinkSpy = sinon.stub(fs, 'unlinkSync').throws('unlink failed');
         commandsRestore = fakeCommands({
-          apt: () => 0,
+          'apt-get': () => 0,
         });
       });
 
