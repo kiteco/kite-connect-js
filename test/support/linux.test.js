@@ -163,7 +163,7 @@ describe('LinuxAdapter', () => {
             return LinuxAdapter.downloadKite(url, options)
             .then(() => {
               expect(https.request.calledWith(url)).to.be.ok();
-              expect(proc.spawn.calledWith('apt', 
+              expect(proc.spawn.calledWith('apt-get', 
                 ['install', '-f', LinuxAdapter.KITE_DEB_PATH])).to.be.ok();
               
               expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_DEB_PATH)).to.be.ok();
@@ -201,7 +201,7 @@ describe('LinuxAdapter', () => {
         };
         return waitsForPromise(() => LinuxAdapter.installKite(options))
         .then(() => {
-          expect(proc.spawn.calledWith('apt', [
+          expect(proc.spawn.calledWith('apt-get', [
             'install', '-f', LinuxAdapter.KITE_DEB_PATH,
           ])).to.be.ok();
           expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_DEB_PATH)).to.be.ok();
