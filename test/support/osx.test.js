@@ -15,8 +15,9 @@ const {
   withKiteEnterpriseInstalled, withBothKiteInstalled,
   withKiteEnterpriseRunning, withKiteEnterpriseNotRunning,
 } = require('../helpers/system');
-const { customEnv } = require('../helpers/utils')
-
+const { customEnv } = require('../helpers/utils');
+const { kiteDownloadRoutes } = require('../helpers/kite');
+ 
 const PLATFORM = 'darwin';
 
 describe('OSXAdapter', () => {
@@ -101,15 +102,7 @@ describe('OSXAdapter', () => {
   });
 
   describe('.downloadKite()', () => {
-    withFakeServer([
-      [
-        o => /^https:\/\/kite\.com/.test(o),
-        o => fakeResponse(303, '', {headers: {location: 'https://download.kite.com'}}),
-      ], [
-        o => /^https:\/\/download\.kite\.com/.test(o),
-        o => fakeResponse(200, 'foo'),
-      ],
-    ], () => {
+    withFakeServer(kiteDownloadRoutes, () => {
       describe('when the download succeeds', () => {
         beforeEach(() => {
           fakeCommands({

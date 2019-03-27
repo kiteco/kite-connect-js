@@ -157,7 +157,9 @@ function withFakeServer(routes, block) {
 
     afterEach(() => {
       httpSpy.restore();
+      httpSpy = undefined;
       httpsSpy.restore();
+      httpsSpy = undefined;
     });
 
     block();

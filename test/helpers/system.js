@@ -1,6 +1,6 @@
 'use strict';
 
-let WindowsSupport, OSXSupport;
+let WindowsSupport, OSXSupport, LinuxSupport;
 
 const os = require('os');
 const {fakeCommands} = require('./child_process');
@@ -43,6 +43,19 @@ function fakeKiteInstallPaths(platform) {
         safePaths = WindowsSupport.KITE_EXE_PATH;
         WindowsSupport.KITE_EXE_PATH = 'C:\\Windows\\Kite.exe';
         break;
+      case 'linux':
+        commandsRestore = fakeCommands({
+          '/bin/ps': (ps) => {
+            ps.stdout('');
+            return 0;
+          },
+        });
+        if (!LinuxSupport) {
+          LinuxSupport = require('../../lib/support/linux');
+        }
+        safePaths = LinuxSupport.KITED_PATH;
+        LinuxSupport.KITED_PATH = '/path/to/kited';
+        break;
     }
   });
 
@@ -54,6 +67,9 @@ function fakeKiteInstallPaths(platform) {
         break;
       case 'win32':
         WindowsSupport.KITE_EXE_PATH = safePaths;
+        break;
+      case 'linux':
+        LinuxSupport.KITED_PATH = safePaths;
         break;
     }
   });
@@ -86,9 +102,21 @@ function withKiteInstalled(platform, block) {
             },
           });
           if (!WindowsSupport) {
-            WindowsSupport = require('../lib/support/windows');
+            WindowsSupport = require('../../lib/support/windows');
           }
           WindowsSupport.KITE_EXE_PATH = __filename;
+          break;
+        case 'linux':
+          commandsRestore = fakeCommands({
+            [__filename]: (ps) => {
+              ps.stdout('');
+              return 0;
+            },
+          });
+          if (!LinuxSupport) {
+            LinuxSupport = require('../../lib/support/linux');
+          }
+          LinuxSupport.KITED_PATH = __filename;
           break;
       }
     });
@@ -122,9 +150,15 @@ function withKiteEnterpriseInstalled(platform, block) {
           break;
         case 'win32':
           if (!WindowsSupport) {
-            WindowsSupport = require('../lib/support/windows');
+            WindowsSupport = require('../../lib/support/windows');
           }
           WindowsSupport.KITE_EXE_PATH = __filename;
+          break;
+        case 'linux':
+          if (!LinuxSupport) {
+            LinuxSupport = require('../../lib/support/linux');
+          }
+          LinuxSupport.KITED_PATH = __filename;
           break;
       }
     });
@@ -157,9 +191,15 @@ function withBothKiteInstalled(platform, block) {
           break;
         case 'win32':
           if (!WindowsSupport) {
-            WindowsSupport = require('../lib/support/windows');
+            WindowsSupport = require('../../lib/support/windows');
           }
           WindowsSupport.KITE_EXE_PATH = __filename;
+          break;
+        case 'linux':
+          if (!LinuxSupport) {
+            LinuxSupport = require('../../lib/support/linux');
+          }
+          LinuxSupport.KITED_PATH = __filename;
           break;
       }
     });
@@ -189,6 +229,14 @@ function withKiteRunning(platform, block) {
             fakeCommands({
               'tasklist': (ps) => {
                 ps.stdout('kited.exe');
+                return 0;
+              },
+            });
+            break;
+          case 'linux':
+            fakeCommands({
+              '/bin/ps': (ps) => {
+                ps.stdout('kited');
                 return 0;
               },
             });
@@ -225,6 +273,15 @@ function withKiteNotRunning(platform, block) {
               [WindowsSupport.KITE_EXE_PATH]: () => 0,
             });
             break;
+          case 'linux':
+            fakeCommands({
+              '/bin/ps': (ps) => {
+                ps.stdout('');
+                return 0; 
+              },
+              [LinuxSupport.KITED_PATH]: () => 0,
+            });
+            break;
         }
       });
 
@@ -250,6 +307,14 @@ function withKiteEnterpriseRunning(platform, block) {
             fakeCommands({
               'tasklist': (ps) => {
                 ps.stdout('kited.exe');
+                return 0;
+              },
+            });
+            break;
+          case 'linux':
+            fakeCommands({
+              '/bin/ps': (ps) => {
+                ps.stdout('kited');
                 return 0;
               },
             });
@@ -284,6 +349,15 @@ function withKiteEnterpriseNotRunning(platform, block) {
                 return 0;
               },
               [WindowsSupport.KITE_EXE_PATH]: () => 0,
+            });
+            break;
+          case 'linux':
+            fakeCommands({
+              '/bin/ps': (ps) => {
+                ps.stdout('');
+                return 0;
+              },
+              [LinuxSupport.KITED_PATH]: () => 0,
             });
             break;
         }

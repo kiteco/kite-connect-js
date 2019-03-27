@@ -115,7 +115,18 @@ function withKiteRoutes(routes = [], block) {
   }
 }
 
+const kiteDownloadRoutes = [
+  [
+    o => /^https:\/\/kite\.com/.test(o),
+    o => fakeResponse(303, '', {headers: {location: 'https://download.kite.com'}}),
+  ], [
+    o => /^https:\/\/download\.kite\.com/.test(o),
+    o => fakeResponse(200, 'foo'),
+  ],
+];
+
 module.exports = {
   withKite,
   withKiteRoutes,
+  kiteDownloadRoutes,
 };

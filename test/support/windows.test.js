@@ -13,6 +13,7 @@ const {fakeCommands} = require('../helpers/child_process');
 const {
   fakeKiteInstallPaths, withKiteInstalled, withKiteRunning, withKiteNotRunning,
 } = require('../helpers/system');
+const { kiteDownloadRoutes } = require('../helpers/kite');
 
 const PLATFORM = 'win32';
 
@@ -36,22 +37,15 @@ describe('WindowsAdapter', () => {
   });
 
   describe('.downloadKite()', () => {
-    withFakeServer([
-      [
-        o => /^https:\/\/kite\.com/.test(o),
-        o => fakeResponse(303, '', {headers: {location: 'https://download.kite.com'}}),
-      ], [
-        o => /^https:\/\/download\.kite\.com/.test(o),
-        o => fakeResponse(200, 'foo'),
-      ],
-    ], () => {
+    let commandsRestore;
+    withFakeServer(kiteDownloadRoutes, () => {
       describe('when the download succeeds', () => {
         let unlinkSpy;
         beforeEach(() => {
           unlinkSpy = sinon.stub(fs, 'unlinkSync');
-          fakeCommands({
+          commandsRestore = fakeCommands({
             exec: {
-              [`"${WindowsAdapter.KITE_INSTALLER_PATH}"` + ' --skip-onboarding --plugin-launch']: () => 0,
+              [`"${WindowsAdapter.KITE_INSTALLER_PATH}"` + ' --skip-onboarding --plugin-launch --channel=autocomplete-python']: () => 0,
             },
             del: () => 0,
           });
@@ -59,12 +53,13 @@ describe('WindowsAdapter', () => {
 
         afterEach(() => {
           unlinkSpy.restore();
+          commandsRestore.restore();
         });
 
         describe('with the install option', () => {
           it('returns a promise resolved after the install', () => {
             const options = {
-              installed: true,
+              install: true,
               onDownload: sinon.spy(),
               onInstallStart: sinon.spy(),
               onCopy: sinon.spy(),
@@ -72,7 +67,7 @@ describe('WindowsAdapter', () => {
             };
             const url = 'https://kite.com/download';
 
-            WindowsAdapter.downloadKite(url, options)
+            return WindowsAdapter.downloadKite(url, options)
             .then(() => {
               expect(https.request.calledWith(url)).to.be.ok();
 
@@ -199,7 +194,7 @@ describe('WindowsAdapter', () => {
 
   describe('.runKite()', () => {
     describe('when kite is not installed', () => {
-      it('returns a rejected function', () => {
+      it('returns a rejected promise', () => {
         return waitsForPromise({shouldReject: true}, () => WindowsAdapter.runKite());
       });
     });
