@@ -74,27 +74,6 @@ describe('LinuxAdapter', () => {
   });
 
   describe('.isOSVersionSupported()', () => {
-    describe('when the os version is not supported', () => {
-      beforeEach(() => {
-        commandsRestore = fakeCommands({
-          exec: {
-            'lsb_release -r': (ps) => {
-              ps.stdout('Release:	16.04');
-              return 0;
-            },
-          },
-        });
-      });
-
-      afterEach(() => {
-        commandsRestore.restore();
-      });
-
-      it('returns false', () => {
-        expect(LinuxAdapter.isOSVersionSupported()).not.to.be.ok();
-      });
-    });
-
     describe('when the os version is supported', () => {
       beforeEach(() => {
         commandsRestore = fakeCommands({
@@ -106,7 +85,7 @@ describe('LinuxAdapter', () => {
           },
         });
       });
-      
+
       afterEach(() => {
         commandsRestore.restore();
       });
@@ -163,9 +142,9 @@ describe('LinuxAdapter', () => {
             return LinuxAdapter.downloadKite(url, options)
             .then(() => {
               expect(https.request.calledWith(url)).to.be.ok();
-              expect(proc.spawn.calledWith('apt', 
+              expect(proc.spawn.calledWith('apt',
                 ['install', '-f', LinuxAdapter.KITE_DEB_PATH])).to.be.ok();
-              
+
               expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_DEB_PATH)).to.be.ok();
 
               expect(options.onInstallStart.called).to.be.ok();
