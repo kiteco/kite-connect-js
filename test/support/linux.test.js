@@ -279,6 +279,7 @@ describe('LinuxAdapter', () => {
 
       afterEach(() => {
         existSpy.restore();
+        LinuxAdapter.resetInstallPath();
       });
 
       it('returns a rejected promise', () => {
@@ -293,6 +294,7 @@ describe('LinuxAdapter', () => {
 
       afterEach(() => {
         existSpy.restore();
+        LinuxAdapter.resetInstallPath();
       });
 
       it('returns a resolved promise', () => {
@@ -307,6 +309,7 @@ describe('LinuxAdapter', () => {
 
       afterEach(() => {
         existSpy.restore();
+        LinuxAdapter.resetInstallPath();
       });
 
       it('returns a resolved promise', () => {

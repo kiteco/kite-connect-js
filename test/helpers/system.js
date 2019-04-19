@@ -70,6 +70,7 @@ function fakeKiteInstallPaths(platform) {
         break;
       case 'linux':
         LinuxSupport.KITED_PATH = safePaths;
+        LinuxSupport.resetInstallPath();
         break;
     }
   });
@@ -123,6 +124,7 @@ function withKiteInstalled(platform, block) {
 
     afterEach(() => {
       commandsRestore && commandsRestore.restore();
+
     });
 
     block();
