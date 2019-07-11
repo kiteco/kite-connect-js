@@ -143,9 +143,9 @@ describe('LinuxAdapter', () => {
             .then(() => {
               expect(https.request.calledWith(url)).to.be.ok();
               expect(proc.spawn.calledWith('apt',
-                ['install', '-f', LinuxAdapter.KITE_DEB_PATH])).to.be.ok();
+                ['install', '-f', LinuxAdapter.KITE_INSTALLER_PATH])).to.be.ok();
 
-              expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_DEB_PATH)).to.be.ok();
+              expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_INSTALLER_PATH)).to.be.ok();
 
               expect(options.onInstallStart.called).to.be.ok();
               expect(options.onMount.called).to.be.ok();
@@ -181,9 +181,9 @@ describe('LinuxAdapter', () => {
         return waitsForPromise(() => LinuxAdapter.installKite(options))
         .then(() => {
           expect(proc.spawn.calledWith('apt', [
-            'install', '-f', LinuxAdapter.KITE_DEB_PATH,
+            'install', '-f', LinuxAdapter.KITE_INSTALLER_PATH,
           ])).to.be.ok();
-          expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_DEB_PATH)).to.be.ok();
+          expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_INSTALLER_PATH)).to.be.ok();
 
           expect(options.onInstallStart.called).to.be.ok();
           expect(options.onMount.called).to.be.ok();
