@@ -14,7 +14,7 @@ const {fakeCommands} = require('../helpers/child_process');
 const {
   withKiteInstalled, withKiteRunning, withKiteNotRunning,
 } = require('../helpers/system');
-const {kiteDownloadRoutes} = require('../helpers/kite');
+const { kiteDownloadRoutes } = require('../helpers/kite');
 
 const PLATFORM = 'linux';
 
