@@ -3,6 +3,8 @@
 const proc = require('child_process');
 const fs = require('fs');
 const https = require('https');
+const os = require('os');
+const path = require('path');
 const sinon = require('sinon');
 const expect = require('expect.js');
 
@@ -120,7 +122,7 @@ describe('LinuxAdapter', () => {
           unlinkSpy = sinon.stub(fs, 'unlinkSync');
 
           commandsRestore = fakeCommands({
-            'apt': () => 0,
+            [path.join(os.tmpdir(), 'kite-installer.sh')]: () => 0,
           });
         });
 
@@ -142,10 +144,8 @@ describe('LinuxAdapter', () => {
             return LinuxAdapter.downloadKite(url, options)
             .then(() => {
               expect(https.request.calledWith(url)).to.be.ok();
-              expect(proc.spawn.calledWith('apt',
-                ['install', '-f', LinuxAdapter.KITE_DEB_PATH])).to.be.ok();
-
-              expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_DEB_PATH)).to.be.ok();
+              expect(proc.spawn.calledWith(path.join(os.tmpdir(), 'kite-installer.sh'), ['--download'])).to.be.ok();
+              expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_INSTALLER_PATH)).to.be.ok();
 
               expect(options.onInstallStart.called).to.be.ok();
               expect(options.onMount.called).to.be.ok();
@@ -163,7 +163,7 @@ describe('LinuxAdapter', () => {
       beforeEach(() => {
         unlinkSpy = sinon.stub(fs, 'unlinkSync');
         commandsRestore = fakeCommands({
-          'apt': () => 0,
+          [path.join(os.tmpdir(), 'kite-installer.sh')]: () => 0,
         });
       });
 
@@ -180,10 +180,8 @@ describe('LinuxAdapter', () => {
         };
         return waitsForPromise(() => LinuxAdapter.installKite(options))
         .then(() => {
-          expect(proc.spawn.calledWith('apt', [
-            'install', '-f', LinuxAdapter.KITE_DEB_PATH,
-          ])).to.be.ok();
-          expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_DEB_PATH)).to.be.ok();
+          expect(proc.spawn.calledWith(path.join(os.tmpdir(), 'kite-installer.sh'), ['--install'])).to.be.ok();
+          expect(fs.unlinkSync.calledWith(LinuxAdapter.KITE_INSTALLER_PATH)).to.be.ok();
 
           expect(options.onInstallStart.called).to.be.ok();
           expect(options.onMount.called).to.be.ok();
@@ -314,10 +312,10 @@ describe('LinuxAdapter', () => {
 
       it('returns a resolved promise', () => {
         return waitsForPromise(() => LinuxAdapter.runKite())
-          .then(() => {
-            expect(proc.spawn.lastCall.args[0])
-            .to.eql(LinuxAdapter.KITED_PATH);
-          });
+        .then(() => {
+          expect(proc.spawn.lastCall.args[0])
+          .to.eql(LinuxAdapter.KITED_PATH);
+        });
       });
     });
   });
