@@ -339,7 +339,7 @@ describe('OSXAdapter', () => {
           ])).to.be.ok();
 
           expect(proc.spawn.calledWith('open', [
-            '-a', OSXAdapter.installPath, '--args', '--plugin-launch-with-copilot', '--channel=autocomplete-python',
+            '-a', OSXAdapter.installPath, '--args', '--plugin-launch', '--channel=autocomplete-python',
           ], customEnv(process.env, null, ['ELECTRON_RUN_AS_NODE']))).to.be.ok();
         });
       });
