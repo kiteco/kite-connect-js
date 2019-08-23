@@ -232,6 +232,20 @@ KiteConnector.canRunKite()
 })
 ```
 
+#### .runKiteWithCopilot()
+
+Starts an already installed Kite, opens the Copilot, and returns a promise that will resolve if Kite have been successfully started. The operation is delegated to the underlying adapter object which will handle OS specific operations.
+
+```js
+KiteConnector.runKiteWithCopilot()
+.then(() => {
+  // Kite is running but not necessarily reachable
+})
+.catch(() => {
+  // Kite couldn't be started
+})
+```
+
 #### .runKite()
 
 Starts an already installed Kite and returns a promise that will resolve if Kite have been successfully started. The operation is delegated to the underlying adapter object which will handle OS specific operations.
