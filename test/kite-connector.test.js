@@ -6,13 +6,13 @@ const expect = require('expect.js');
 const KiteConnector = require('../lib');
 const BrowserClient = require('../lib/clients/browser');
 const NodeClient = require('../lib/clients/node');
-const {waitsForPromise} = require('./helpers/async');
-const {withKite, withKiteRoutes} = require('./helpers/kite');
-const {fakeResponse} = require('./helpers/http');
+const { waitsForPromise } = require('./helpers/async');
+const { withKite, withKiteRoutes } = require('./helpers/kite');
+const { fakeResponse } = require('./helpers/http');
 
 describe('KiteConnector', () => {
   describe('.canInstallKite()', () => {
-    withKite({supported: false}, () => {
+    withKite({ supported: false }, () => {
       it('returns a rejected promise', () => {
         return waitsForPromise({
           shouldReject: true,
@@ -20,7 +20,7 @@ describe('KiteConnector', () => {
       });
     });
 
-    withKite({installed: true}, () => {
+    withKite({ installed: true }, () => {
       it('returns a rejected promise', () => {
         return waitsForPromise({
           shouldReject: true,
@@ -28,7 +28,7 @@ describe('KiteConnector', () => {
       });
     });
 
-    withKite({installed: false}, () => {
+    withKite({ installed: false }, () => {
       it('returns a resolved promise', () => {
         return waitsForPromise(() => KiteConnector.canInstallKite());
       });
@@ -36,7 +36,7 @@ describe('KiteConnector', () => {
   });
 
   describe('.canRunKite()', () => {
-    withKite({installed: false}, () => {
+    withKite({ installed: false }, () => {
       it('returns a rejected promise', () => {
         return waitsForPromise({
           shouldReject: true,
@@ -44,7 +44,7 @@ describe('KiteConnector', () => {
       });
     });
 
-    withKite({running: true}, () => {
+    withKite({ running: true }, () => {
       it('returns a rejected promise', () => {
         return waitsForPromise({
           shouldReject: true,
@@ -52,7 +52,7 @@ describe('KiteConnector', () => {
       });
     });
 
-    withKite({running: false}, () => {
+    withKite({ running: false }, () => {
       it('returns a resolved promise', () => {
         return waitsForPromise(() => KiteConnector.canRunKite());
       });
@@ -60,7 +60,7 @@ describe('KiteConnector', () => {
   });
 
   describe('.canRunKiteEnterprise()', () => {
-    withKite({installedEnterprise: false}, () => {
+    withKite({ installedEnterprise: false }, () => {
       it('returns a rejected promise', () => {
         return waitsForPromise({
           shouldReject: true,
@@ -68,7 +68,7 @@ describe('KiteConnector', () => {
       });
     });
 
-    withKite({runningEnterprise: true}, () => {
+    withKite({ runningEnterprise: true }, () => {
       it('returns a rejected promise', () => {
         return waitsForPromise({
           shouldReject: true,
@@ -76,7 +76,7 @@ describe('KiteConnector', () => {
       });
     });
 
-    withKite({runningEnterprise: false}, () => {
+    withKite({ runningEnterprise: false }, () => {
       it('returns a resolved promise', () => {
         return waitsForPromise(() => KiteConnector.canRunKiteEnterprise());
       });
@@ -84,22 +84,22 @@ describe('KiteConnector', () => {
   });
 
   describe('.waitForKite()', () => {
-    withKite({reachable: true}, () => {
+    withKite({ reachable: true }, () => {
       it('returns a resolving promise', () => {
         return waitsForPromise(() => KiteConnector.waitForKite(5, 0));
       });
     });
 
-    withKite({reachable: false}, () => {
+    withKite({ reachable: false }, () => {
       beforeEach(() => {
         sinon.spy(KiteConnector, 'isKiteReachable');
       });
 
       it('returns a promise that will be rejected after the specified number of attempts', () => {
-        return waitsForPromise({shouldReject: true}, () => KiteConnector.waitForKite(5, 0))
-        .then(() => {
-          expect(KiteConnector.isKiteReachable.callCount).to.eql(5);
-        });
+        return waitsForPromise({ shouldReject: true }, () => KiteConnector.waitForKite(5, 0))
+          .then(() => {
+            expect(KiteConnector.isKiteReachable.callCount).to.eql(5);
+          });
       });
     });
   });
@@ -107,9 +107,9 @@ describe('KiteConnector', () => {
   [
     ['isKiteInstalled'],
     ['isKiteRunning'],
-    ['installKite', {foo: 'bar'}],
-    ['downloadKiteRelease', {foo: 'bar'}],
-    ['downloadKite', 'http://kite.com', {foo: 'bar'}],
+    ['installKite', { foo: 'bar' }],
+    ['downloadKiteRelease', { foo: 'bar' }],
+    ['downloadKite', 'http://kite.com', { foo: 'bar' }],
     ['runKite'],
     ['isKiteEnterpriseInstalled'],
     ['isKiteEnterpriseRunning'],
@@ -121,7 +121,7 @@ describe('KiteConnector', () => {
 
       withKite({}, () => {
         beforeEach(() => {
-          stub = sinon.stub(KiteConnector.adapter, method).callsFake(() => {});
+          stub = sinon.stub(KiteConnector.adapter, method).callsFake(() => { });
         });
 
         afterEach(() => {
@@ -137,12 +137,12 @@ describe('KiteConnector', () => {
   });
 
   describe('.request()', () => {
-    withKite({supported: false}, () => {
+    withKite({ supported: false }, () => {
       it('returns a rejected promise with the UNSUPPORTED state', () => {
-        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
-        .then(err => {
-          expect(err.data.state).to.eql(KiteConnector.STATES.UNSUPPORTED);
-        });
+        return waitsForPromise({ shouldReject: true }, () => KiteConnector.request({ path: '/foo' }))
+          .then(err => {
+            expect(err.data.state).to.eql(KiteConnector.STATES.UNSUPPORTED);
+          });
       });
 
       describe('with a onDidFailRequest listener', () => {
@@ -155,168 +155,150 @@ describe('KiteConnector', () => {
         it('unregisters the listener when calling dispose() on the disposable', () => {
           disposable.dispose();
 
-          return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
-          .then(() => {
-            expect(failSpy.called).not.to.be.ok();
-          });
+          return waitsForPromise({ shouldReject: true }, () => KiteConnector.request({ path: '/foo' }))
+            .then(() => {
+              expect(failSpy.called).not.to.be.ok();
+            });
         });
 
         it('notifies the listener of the failure', () => {
-          return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
-          .then(() => {
-            expect(failSpy.called).to.be.ok();
-            expect(failSpy.lastCall.args[0].data.state).to.eql(KiteConnector.STATES.UNSUPPORTED);
-          });
+          return waitsForPromise({ shouldReject: true }, () => KiteConnector.request({ path: '/foo' }))
+            .then(() => {
+              expect(failSpy.called).to.be.ok();
+              expect(failSpy.lastCall.args[0].data.state).to.eql(KiteConnector.STATES.UNSUPPORTED);
+            });
         });
       });
     });
 
-    withKite({supported: true}, () => {
+    withKite({ supported: true }, () => {
       it('returns a rejected promise with the UNINSTALLED state', () => {
-        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
-        .then(err => {
-          expect(err.data.state).to.eql(KiteConnector.STATES.UNINSTALLED);
-        });
+        return waitsForPromise({ shouldReject: true }, () => KiteConnector.request({ path: '/foo' }))
+          .then(err => {
+            expect(err.data.state).to.eql(KiteConnector.STATES.UNINSTALLED);
+          });
       });
     });
 
-    withKite({installed: true}, () => {
+    withKite({ installed: true }, () => {
       it('returns a rejected promise with the NOT_RUNNING state', () => {
-        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
-        .then(err => {
-          expect(err.data.state).to.eql(KiteConnector.STATES.NOT_RUNNING);
-        });
+        return waitsForPromise({ shouldReject: true }, () => KiteConnector.request({ path: '/foo' }))
+          .then(err => {
+            expect(err.data.state).to.eql(KiteConnector.STATES.NOT_RUNNING);
+          });
       });
     });
 
-    withKite({running: true}, () => {
+    withKite({ running: true }, () => {
       it('returns a rejected promise with the UNREACHABLE state', () => {
-        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
-        .then(err => {
-          expect(err.data.state).to.eql(KiteConnector.STATES.UNREACHABLE);
-        });
+        return waitsForPromise({ shouldReject: true }, () => KiteConnector.request({ path: '/foo' }))
+          .then(err => {
+            expect(err.data.state).to.eql(KiteConnector.STATES.UNREACHABLE);
+          });
       });
     });
 
-    withKite({reachable: true}, () => {
+    withKite({ reachable: true }, () => {
       withKiteRoutes([[
         o => o.path === '/foo',
         o => fakeResponse(401, ''),
       ]]);
 
       it('returns a rejected promise with a bad_status', () => {
-        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
-        .then(err => {
-          expect(err.type).to.eql('bad_status');
-          expect(err.data.responseStatus).to.eql(401);
-          expect(err.data.responseData).to.eql('');
-        });
+        return waitsForPromise({ shouldReject: true }, () => KiteConnector.request({ path: '/foo' }))
+          .then(err => {
+            expect(err.type).to.eql('bad_status');
+            expect(err.data.responseStatus).to.eql(401);
+            expect(err.data.responseData).to.eql('');
+          });
       });
     });
 
-    withKite({reachable: true}, () => {
+    withKite({ reachable: true }, () => {
       withKiteRoutes([[
         o => o.path === '/foo',
         o => fakeResponse(403, ''),
       ]]);
 
       it('returns a rejected promise with a bad_status', () => {
-        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
-        .then(err => {
-          expect(err.type).to.eql('bad_status');
-          expect(err.data.responseStatus).to.eql(403);
-          expect(err.data.responseData).to.eql('');
-        });
+        return waitsForPromise({ shouldReject: true }, () => KiteConnector.request({ path: '/foo' }))
+          .then(err => {
+            expect(err.type).to.eql('bad_status');
+            expect(err.data.responseStatus).to.eql(403);
+            expect(err.data.responseData).to.eql('');
+          });
       });
     });
 
-    withKite({reachable: true}, () => {
+    withKite({ reachable: true }, () => {
       withKiteRoutes([[
         o => o.path === '/foo',
         o => fakeResponse(404, 'not found'),
       ]]);
 
       it('returns a rejected promise with a bad_status', () => {
-        return waitsForPromise({shouldReject: true}, () => KiteConnector.request({path: '/foo'}))
-        .then(err => {
-          expect(err.type).to.eql('bad_status');
-          expect(err.data.responseStatus).to.eql(404);
-          expect(err.data.responseData).to.eql('not found');
-        });
+        return waitsForPromise({ shouldReject: true }, () => KiteConnector.request({ path: '/foo' }))
+          .then(err => {
+            expect(err.type).to.eql('bad_status');
+            expect(err.data.responseStatus).to.eql(404);
+            expect(err.data.responseData).to.eql('not found');
+          });
       });
     });
 
-    withKite({reachable: true}, () => {
+    withKite({ reachable: true }, () => {
       withKiteRoutes([[
         o => o.path === '/foo',
         o => fakeResponse(200),
       ]]);
 
       it('returns a resolved promise with the response object', () => {
-        return waitsForPromise(() => KiteConnector.request({path: '/foo'}))
-        .then(resp => {
-          expect(resp.statusCode).to.eql(200);
-        });
+        return waitsForPromise(() => KiteConnector.request({ path: '/foo' }))
+          .then(resp => {
+            expect(resp.statusCode).to.eql(200);
+          });
       });
     });
   });
 
   describe('.checkHealth()', () => {
-    withKite({supported: false}, () => {
+    withKite({ supported: false }, () => {
       it('returns a promise resolved with the corresponding state', () => {
         return waitsForPromise(() => KiteConnector.checkHealth())
-        .then(state => {
-          expect(state).to.eql(KiteConnector.STATES.UNSUPPORTED);
-        });
+          .then(state => {
+            expect(state).to.eql(KiteConnector.STATES.UNSUPPORTED);
+          });
       });
     });
 
-    withKite({installed: false}, () => {
+    withKite({ installed: false }, () => {
       it('returns a promise resolved with the corresponding state', () => {
         return waitsForPromise(() => KiteConnector.checkHealth())
-        .then(state => {
-          expect(state).to.eql(KiteConnector.STATES.UNINSTALLED);
-        });
+          .then(state => {
+            expect(state).to.eql(KiteConnector.STATES.UNINSTALLED);
+          });
       });
     });
 
-    withKite({running: false}, () => {
+    withKite({ running: false }, () => {
       it('returns a promise resolved with the corresponding state', () => {
         return waitsForPromise(() => KiteConnector.checkHealth())
-        .then(state => {
-          expect(state).to.eql(KiteConnector.STATES.INSTALLED);
-        });
+          .then(state => {
+            expect(state).to.eql(KiteConnector.STATES.INSTALLED);
+          });
       });
     });
 
-    withKite({installedEnterprise: false}, () => {
+    withKite({ reachable: false }, () => {
       it('returns a promise resolved with the corresponding state', () => {
         return waitsForPromise(() => KiteConnector.checkHealth())
-        .then(state => {
-          expect(state).to.eql(KiteConnector.STATES.UNINSTALLED);
-        });
+          .then(state => {
+            expect(state).to.eql(KiteConnector.STATES.RUNNING);
+          });
       });
     });
 
-    withKite({runningEnterprise: false}, () => {
-      it('returns a promise resolved with the corresponding state', () => {
-        return waitsForPromise(() => KiteConnector.checkHealth())
-        .then(state => {
-          expect(state).to.eql(KiteConnector.STATES.INSTALLED);
-        });
-      });
-    });
-
-    withKite({reachable: false}, () => {
-      it('returns a promise resolved with the corresponding state', () => {
-        return waitsForPromise(() => KiteConnector.checkHealth())
-        .then(state => {
-          expect(state).to.eql(KiteConnector.STATES.RUNNING);
-        });
-      });
-    });
-
-    withKite({reachable: true}, () => {
+    withKite({ reachable: true }, () => {
       withKiteRoutes([[
         o => o.path === '/clientapi/user',
         o => fakeResponse(500),
@@ -328,7 +310,7 @@ describe('KiteConnector', () => {
       });
     });
 
-    withKite({reachable: true}, () => {
+    withKite({ reachable: true }, () => {
       withKiteRoutes([[
         o => o.path === '/clientapi/user',
         o => fakeResponse(200),
