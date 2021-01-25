@@ -115,7 +115,7 @@ describe('KiteConnector', () => {
     ['isKiteEnterpriseRunning'],
     ['runKiteEnterprise'],
     ['hasBothKiteInstalled'],
-    ['hasKiteConfig'],
+    ['hasKiteRun'],
   ].forEach(([method, ...args]) => {
     describe(`.${method}()`, () => {
       let stub;
