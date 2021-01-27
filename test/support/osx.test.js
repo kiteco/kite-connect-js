@@ -7,9 +7,9 @@ const expect = require('expect.js');
 
 const OSXAdapter = require('../../lib/support/osx');
 
-const {waitsForPromise} = require('../helpers/async');
-const {fakeResponse, withFakeServer} = require('../helpers/http');
-const {fakeCommands} = require('../helpers/child_process');
+const { waitsForPromise } = require('../helpers/async');
+const { withFakeServer } = require('../helpers/http');
+const { fakeCommands } = require('../helpers/child_process');
 const {
   fakeKiteInstallPaths, withKiteInstalled, withKiteRunning, withKiteNotRunning,
   withKiteEnterpriseInstalled, withBothKiteInstalled,
@@ -17,7 +17,7 @@ const {
 } = require('../helpers/system');
 const { customEnv } = require('../helpers/utils');
 const { kiteDownloadRoutes } = require('../helpers/kite');
- 
+
 const PLATFORM = 'darwin';
 
 describe('OSXAdapter', () => {
@@ -40,7 +40,7 @@ describe('OSXAdapter', () => {
 
     withKiteEnterpriseInstalled(PLATFORM, () => {
       it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () =>
+        return waitsForPromise({ shouldReject: true }, () =>
           OSXAdapter.isKiteInstalled());
       });
     });
@@ -49,14 +49,14 @@ describe('OSXAdapter', () => {
   describe('.isKiteEnterpriseInstalled()', () => {
     describe('when kite enterprise is not installed', () => {
       it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () =>
+        return waitsForPromise({ shouldReject: true }, () =>
           OSXAdapter.isKiteEnterpriseInstalled());
       });
     });
 
     withKiteInstalled(PLATFORM, () => {
       it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () =>
+        return waitsForPromise({ shouldReject: true }, () =>
           OSXAdapter.isKiteEnterpriseInstalled());
       });
     });
@@ -71,16 +71,16 @@ describe('OSXAdapter', () => {
   describe('.hasBothKiteInstalled()', () => {
     describe('when no kite is installed', () => {
       it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () =>
-        OSXAdapter.hasBothKiteInstalled());
+        return waitsForPromise({ shouldReject: true }, () =>
+          OSXAdapter.hasBothKiteInstalled());
       });
     });
 
     describe('when kite enterprise is not installed', () => {
       withKiteInstalled(PLATFORM, () => {
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
-          OSXAdapter.hasBothKiteInstalled());
+          return waitsForPromise({ shouldReject: true }, () =>
+            OSXAdapter.hasBothKiteInstalled());
         });
       });
     });
@@ -88,8 +88,8 @@ describe('OSXAdapter', () => {
     describe('when kite is not installed', () => {
       withKiteEnterpriseInstalled(PLATFORM, () => {
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () =>
-          OSXAdapter.hasBothKiteInstalled());
+          return waitsForPromise({ shouldReject: true }, () =>
+            OSXAdapter.hasBothKiteInstalled());
         });
       });
     });
@@ -109,6 +109,7 @@ describe('OSXAdapter', () => {
             hdiutil: () => 0,
             cp: () => 0,
             rm: () => 0,
+            codesign: () => 0,
             mdfind: (ps) => {
               ps.stdout('');
               return 0;
@@ -140,32 +141,35 @@ describe('OSXAdapter', () => {
             const url = 'https://kite.com/download';
 
             return OSXAdapter.downloadKite(url, options)
-            .then(() => {
-              expect(https.request.calledWith(url)).to.be.ok();
-              expect(proc.spawn.calledWith('hdiutil', [
-                'attach', '-nobrowse',
-                OSXAdapter.KITE_DMG_PATH,
-              ])).to.be.ok();
-              expect(proc.spawn.calledWith('cp', [
-                '-r',
-                OSXAdapter.KITE_APP_PATH.mounted,
-                OSXAdapter.APPS_PATH,
-              ])).to.be.ok();
-              expect(proc.spawn.calledWith('hdiutil', [
-                'detach',
-                OSXAdapter.KITE_VOLUME_PATH,
-              ])).to.be.ok();
-              expect(proc.spawn.calledWith('rm', [
-                OSXAdapter.KITE_DMG_PATH,
-              ])).to.be.ok();
+              .then(() => {
+                expect(https.request.calledWith(url)).to.be.ok();
+                expect(proc.spawn.calledWith('hdiutil', [
+                  'attach', '-nobrowse',
+                  OSXAdapter.KITE_DMG_PATH,
+                ])).to.be.ok();
+                expect(proc.spawn.calledWith('cp', [
+                  '-R',
+                  OSXAdapter.KITE_APP_PATH.mounted,
+                  OSXAdapter.APPS_PATH,
+                ])).to.be.ok();
+                expect(proc.spawn.calledWith('codesign', [
+                  '--force', '--deep', '--sign', '-', OSXAdapter.KITE_APP_PATH.defaultInstalled,
+                ])).to.be.ok();
+                expect(proc.spawn.calledWith('hdiutil', [
+                  'detach',
+                  OSXAdapter.KITE_VOLUME_PATH,
+                ])).to.be.ok();
+                expect(proc.spawn.calledWith('rm', [
+                  OSXAdapter.KITE_DMG_PATH,
+                ])).to.be.ok();
 
-              expect(options.onDownload.called).to.be.ok();
-              expect(options.onInstallStart.called).to.be.ok();
-              expect(options.onMount.called).to.be.ok();
-              expect(options.onCopy.called).to.be.ok();
-              expect(options.onUnmount.called).to.be.ok();
-              expect(options.onRemove.called).to.be.ok();
-            });
+                expect(options.onDownload.called).to.be.ok();
+                expect(options.onInstallStart.called).to.be.ok();
+                expect(options.onMount.called).to.be.ok();
+                expect(options.onCopy.called).to.be.ok();
+                expect(options.onUnmount.called).to.be.ok();
+                expect(options.onRemove.called).to.be.ok();
+              });
           });
         });
       });
@@ -179,6 +183,7 @@ describe('OSXAdapter', () => {
           hdiutil: () => 0,
           cp: () => 0,
           rm: () => 0,
+          codesign: () => 0,
           mdfind: (ps, args) => {
             const [, key] = args[0].split(/\s=\s/);
             key === '"com.kite.Kite"'
@@ -199,33 +204,36 @@ describe('OSXAdapter', () => {
         };
 
         return waitsForPromise(() => OSXAdapter.installKite(options))
-        .then(() => {
-          expect(proc.spawn.calledWith('hdiutil', [
-            'attach', '-nobrowse',
-            OSXAdapter.KITE_DMG_PATH,
-          ])).to.be.ok();
-          expect(proc.spawn.calledWith('cp', [
-            '-r',
-            OSXAdapter.KITE_APP_PATH.mounted,
-            OSXAdapter.APPS_PATH,
-          ])).to.be.ok();
-          expect(proc.spawn.calledWith('hdiutil', [
-            'detach',
-            OSXAdapter.KITE_VOLUME_PATH,
-          ])).to.be.ok();
-          expect(proc.spawn.calledWith('rm', [
-            OSXAdapter.KITE_DMG_PATH,
-          ])).to.be.ok();
-          expect(proc.spawn.calledWith('mdfind', [
-            'kMDItemCFBundleIdentifier = "com.kite.Kite"',
-          ])).to.be.ok();
+          .then(() => {
+            expect(proc.spawn.calledWith('hdiutil', [
+              'attach', '-nobrowse',
+              OSXAdapter.KITE_DMG_PATH,
+            ])).to.be.ok();
+            expect(proc.spawn.calledWith('cp', [
+              '-R',
+              OSXAdapter.KITE_APP_PATH.mounted,
+              OSXAdapter.APPS_PATH,
+            ])).to.be.ok();
+            expect(proc.spawn.calledWith('codesign', [
+              '--force', '--deep', '--sign', '-', OSXAdapter.KITE_APP_PATH.defaultInstalled,
+            ])).to.be.ok();
+            expect(proc.spawn.calledWith('hdiutil', [
+              'detach',
+              OSXAdapter.KITE_VOLUME_PATH,
+            ])).to.be.ok();
+            expect(proc.spawn.calledWith('rm', [
+              OSXAdapter.KITE_DMG_PATH,
+            ])).to.be.ok();
+            expect(proc.spawn.calledWith('mdfind', [
+              'kMDItemCFBundleIdentifier = "com.kite.Kite"',
+            ])).to.be.ok();
 
-          expect(options.onInstallStart.called).to.be.ok();
-          expect(options.onMount.called).to.be.ok();
-          expect(options.onCopy.called).to.be.ok();
-          expect(options.onUnmount.called).to.be.ok();
-          expect(options.onRemove.called).to.be.ok();
-        });
+            expect(options.onInstallStart.called).to.be.ok();
+            expect(options.onMount.called).to.be.ok();
+            expect(options.onCopy.called).to.be.ok();
+            expect(options.onUnmount.called).to.be.ok();
+            expect(options.onRemove.called).to.be.ok();
+          });
       });
     });
 
@@ -239,7 +247,7 @@ describe('OSXAdapter', () => {
       });
 
       it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () => OSXAdapter.installKite());
+        return waitsForPromise({ shouldReject: true }, () => OSXAdapter.installKite());
       });
     });
 
@@ -253,7 +261,7 @@ describe('OSXAdapter', () => {
       });
 
       it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () => OSXAdapter.installKite());
+        return waitsForPromise({ shouldReject: true }, () => OSXAdapter.installKite());
       });
     });
 
@@ -267,7 +275,7 @@ describe('OSXAdapter', () => {
       });
 
       it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () => OSXAdapter.installKite());
+        return waitsForPromise({ shouldReject: true }, () => OSXAdapter.installKite());
       });
     });
 
@@ -281,7 +289,7 @@ describe('OSXAdapter', () => {
       });
 
       it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () => OSXAdapter.installKite());
+        return waitsForPromise({ shouldReject: true }, () => OSXAdapter.installKite());
       });
     });
   });
@@ -289,7 +297,7 @@ describe('OSXAdapter', () => {
   describe('.isKiteRunning()', () => {
     describe('when kite is not installed', () => {
       it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () => OSXAdapter.isKiteRunning());
+        return waitsForPromise({ shouldReject: true }, () => OSXAdapter.isKiteRunning());
       });
     });
 
@@ -305,7 +313,7 @@ describe('OSXAdapter', () => {
         });
 
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => OSXAdapter.isKiteRunning());
+          return waitsForPromise({ shouldReject: true }, () => OSXAdapter.isKiteRunning());
         });
       });
 
@@ -320,7 +328,7 @@ describe('OSXAdapter', () => {
   describe('.runKite()', () => {
     describe('when kite is not installed', () => {
       it('returns a rejected function', () => {
-        return waitsForPromise({shouldReject: true}, () => OSXAdapter.runKite());
+        return waitsForPromise({ shouldReject: true }, () => OSXAdapter.runKite());
       });
     });
 
@@ -333,15 +341,15 @@ describe('OSXAdapter', () => {
     withKiteNotRunning(PLATFORM, () => {
       it('returns a resolved promise', () => {
         return waitsForPromise(() => OSXAdapter.runKite())
-        .then(() => {
-          expect(proc.spawn.calledWith('defaults', [
-            'write', 'com.kite.Kite', 'shouldReopenSidebar', '0',
-          ])).to.be.ok();
+          .then(() => {
+            expect(proc.spawn.calledWith('defaults', [
+              'write', 'com.kite.Kite', 'shouldReopenSidebar', '0',
+            ])).to.be.ok();
 
-          expect(proc.spawn.calledWith('open', [
-            '-a', OSXAdapter.installPath, '--args', '--plugin-launch', '--channel=autocomplete-python',
-          ], customEnv(process.env, null, ['ELECTRON_RUN_AS_NODE']))).to.be.ok();
-        });
+            expect(proc.spawn.calledWith('open', [
+              '-a', OSXAdapter.installPath, '--args', '--plugin-launch', '--channel=autocomplete-python',
+            ], customEnv(process.env, null, ['ELECTRON_RUN_AS_NODE']))).to.be.ok();
+          });
       });
     });
   });
@@ -349,7 +357,7 @@ describe('OSXAdapter', () => {
   describe('.isKiteEnterpriseRunning()', () => {
     describe('when kite is not installed', () => {
       it('returns a rejected promise', () => {
-        return waitsForPromise({shouldReject: true}, () => OSXAdapter.isKiteEnterpriseRunning());
+        return waitsForPromise({ shouldReject: true }, () => OSXAdapter.isKiteEnterpriseRunning());
       });
     });
 
@@ -365,7 +373,7 @@ describe('OSXAdapter', () => {
         });
 
         it('returns a rejected promise', () => {
-          return waitsForPromise({shouldReject: true}, () => OSXAdapter.isKiteEnterpriseRunning());
+          return waitsForPromise({ shouldReject: true }, () => OSXAdapter.isKiteEnterpriseRunning());
         });
       });
 
@@ -380,28 +388,28 @@ describe('OSXAdapter', () => {
   describe('.runKiteEnterprise()', () => {
     describe('when kite is not installed', () => {
       it('returns a rejected function', () => {
-        return waitsForPromise({shouldReject: true}, () => OSXAdapter.runKiteEnterprise());
+        return waitsForPromise({ shouldReject: true }, () => OSXAdapter.runKiteEnterprise());
       });
     });
 
     withKiteEnterpriseRunning(PLATFORM, () => {
       it('returns a rejected function', () => {
-        return waitsForPromise({shouldReject: true}, () => OSXAdapter.runKiteEnterprise());
+        return waitsForPromise({ shouldReject: true }, () => OSXAdapter.runKiteEnterprise());
       });
     });
 
     withKiteEnterpriseNotRunning(PLATFORM, () => {
       it('returns a resolved promise', () => {
         return waitsForPromise(() => OSXAdapter.runKiteEnterprise())
-        .then(() => {
-          expect(proc.spawn.calledWith('defaults', [
-            'write', 'enterprise.kite.Kite', 'shouldReopenSidebar', '0',
-          ])).to.be.ok();
+          .then(() => {
+            expect(proc.spawn.calledWith('defaults', [
+              'write', 'enterprise.kite.Kite', 'shouldReopenSidebar', '0',
+            ])).to.be.ok();
 
-          expect(proc.spawn.calledWith('open', [
-            '-a', OSXAdapter.enterpriseInstallPath,
-          ], customEnv(process.env, null, ['ELECTRON_RUN_AS_NODE']))).to.be.ok();
-        });
+            expect(proc.spawn.calledWith('open', [
+              '-a', OSXAdapter.enterpriseInstallPath,
+            ], customEnv(process.env, null, ['ELECTRON_RUN_AS_NODE']))).to.be.ok();
+          });
       });
     });
   });
